@@ -333,12 +333,14 @@ function resetForm() {
 function showAddCourse() {
     document.getElementById('add-course-section').classList.remove('hidden');
     document.getElementById('view-courses-section').classList.add('hidden');
+    document.getElementById('registrations-section').classList.add('hidden');
     updateNavigation('add');
 }
 
 function showAllCourses() {
     document.getElementById('add-course-section').classList.add('hidden');
     document.getElementById('view-courses-section').classList.remove('hidden');
+    document.getElementById('registrations-section').classList.add('hidden');
     updateNavigation('view');
     loadCourses();
 }
