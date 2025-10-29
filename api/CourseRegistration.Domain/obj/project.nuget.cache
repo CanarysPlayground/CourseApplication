@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "7p4JAPwFGb0=",
+  "dgSpecHash": "OBw2fyWr5r4=",
   "success": true,
-  "projectFilePath": "C:\\Users\\kavyashrias\\Documents\\CourseApplication\\api\\CourseRegistration.Domain\\CourseRegistration.Domain.csproj",
+  "projectFilePath": "/home/runner/work/CourseApplication/CourseApplication/api/CourseRegistration.Domain/CourseRegistration.Domain.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
