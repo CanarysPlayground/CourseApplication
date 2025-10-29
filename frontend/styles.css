@@ -313,6 +313,130 @@ body {
     margin-top: 2rem;
 }
 
+/* Filters */
+.filters-container {
+    display: flex;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+.filter-group select {
+    min-width: 150px;
+}
+
+/* Registrations Grid */
+.registrations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.registration-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+}
+
+.registration-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.registration-card .registration-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.registration-card .student-info {
+    flex: 1;
+}
+
+.registration-card .student-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+}
+
+.registration-card .course-name {
+    color: #667eea;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.registration-card .registration-info {
+    display: grid;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+}
+
+.registration-info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+}
+
+.registration-info-item i {
+    color: #667eea;
+    width: 16px;
+}
+
+.registration-status {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.registration-status.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.registration-status.confirmed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.registration-status.cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.registration-status.completed {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
 .course-card {
     background: white;
     border-radius: 1rem;
