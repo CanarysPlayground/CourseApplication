@@ -585,3 +585,333 @@ window.closeModal = closeModal;
 window.refreshCourses = refreshCourses;
 window.filterCourses = filterCourses;
 window.showCourseDetails = showCourseDetails;
+
+// ============================================================================
+// REGISTRATIONS FUNCTIONALITY
+// ============================================================================
+
+let allRegistrations = [];
+let allStudents = [];
+let allCourses = [];
+
+// Navigation to Registrations Section
+function showRegistrations() {
+    document.getElementById('add-course-section').classList.add('hidden');
+    document.getElementById('view-courses-section').classList.add('hidden');
+    document.getElementById('registrations-section').classList.remove('hidden');
+    updateNavigation('registrations');
+    loadRegistrations();
+}
+
+// Load all registrations
+async function loadRegistrations() {
+    const registrationsContainer = document.getElementById('registrations-container');
+    const registrationsLoading = document.getElementById('registrations-loading');
+    const registrationsEmpty = document.getElementById('registrations-empty');
+    
+    try {
+        registrationsLoading.classList.remove('hidden');
+        registrationsContainer.innerHTML = '';
+        registrationsEmpty.classList.add('hidden');
+        
+        const response = await fetch(`${API_BASE_URL}/registrations?pageSize=100`);
+        const result = await response.json();
+        
+        if (response.ok && result.data && result.data.items) {
+            allRegistrations = result.data.items;
+            
+            if (allRegistrations.length === 0) {
+                registrationsEmpty.classList.remove('hidden');
+            } else {
+                displayRegistrations(allRegistrations);
+            }
+        } else {
+            throw new Error('Failed to load registrations');
+        }
+    } catch (error) {
+        console.error('Error loading registrations:', error);
+        registrationsContainer.innerHTML = `
+            <div class="error-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Error Loading Registrations</h3>
+                <p>Unable to load registrations. Please try again.</p>
+                <button class="btn btn-primary" onclick="loadRegistrations()">
+                    <i class="fas fa-retry"></i> Retry
+                </button>
+            </div>
+        `;
+    } finally {
+        registrationsLoading.classList.add('hidden');
+    }
+}
+
+// Display registrations
+function displayRegistrations(registrations) {
+    const registrationsContainer = document.getElementById('registrations-container');
+    
+    registrationsContainer.innerHTML = registrations.map(registration => {
+        const studentName = registration.student 
+            ? registration.student.fullName 
+            : 'Unknown Student';
+        const courseName = registration.course 
+            ? registration.course.courseName 
+            : 'Unknown Course';
+        const statusClass = getRegistrationStatusClass(registration.status);
+        const statusText = getRegistrationStatusText(registration.status);
+        
+        return `
+            <div class="registration-card" onclick="showRegistrationDetails('${registration.registrationId}')">
+                <div class="registration-header">
+                    <div class="student-info">
+                        <div class="student-name">
+                            <i class="fas fa-user"></i>
+                            ${escapeHtml(studentName)}
+                        </div>
+                        <div class="course-name">
+                            <i class="fas fa-book"></i>
+                            ${escapeHtml(courseName)}
+                        </div>
+                    </div>
+                    <span class="registration-status ${statusClass}">
+                        ${statusText}
+                    </span>
+                </div>
+                
+                <div class="registration-info">
+                    <div class="registration-info-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        Registered: ${formatDate(registration.registrationDate)}
+                    </div>
+                    ${registration.grade ? `
+                        <div class="registration-info-item">
+                            <i class="fas fa-graduation-cap"></i>
+                            Grade: ${registration.grade}
+                        </div>
+                    ` : ''}
+                    ${registration.notes ? `
+                        <div class="registration-info-item">
+                            <i class="fas fa-sticky-note"></i>
+                            ${escapeHtml(registration.notes)}
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Show create registration modal
+async function showCreateRegistration() {
+    const modal = document.getElementById('create-registration-modal');
+    
+    // Load students and courses for dropdowns
+    await loadStudentsForDropdown();
+    await loadCoursesForDropdown();
+    
+    // Clear form
+    document.getElementById('create-registration-form').reset();
+    
+    modal.classList.remove('hidden');
+}
+
+// Load students for dropdown
+async function loadStudentsForDropdown() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/students?pageSize=100`);
+        const result = await response.json();
+        
+        if (response.ok && result.data && result.data.items) {
+            allStudents = result.data.items;
+            const select = document.getElementById('registration-student');
+            select.innerHTML = '<option value="">Select a student...</option>' + 
+                allStudents.map(student => 
+                    `<option value="${student.studentId}">${escapeHtml(student.fullName)} - ${escapeHtml(student.email)}</option>`
+                ).join('');
+        }
+    } catch (error) {
+        console.error('Error loading students:', error);
+    }
+}
+
+// Load courses for dropdown
+async function loadCoursesForDropdown() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/courses?pageSize=100`);
+        const result = await response.json();
+        
+        if (response.ok && result.data && result.data.items) {
+            allCourses = result.data.items;
+            const select = document.getElementById('registration-course');
+            select.innerHTML = '<option value="">Select a course...</option>' + 
+                allCourses.map(course => 
+                    `<option value="${course.courseId}">${escapeHtml(course.courseName)} - ${escapeHtml(course.instructorName)}</option>`
+                ).join('');
+        }
+    } catch (error) {
+        console.error('Error loading courses:', error);
+    }
+}
+
+// Handle create registration form submission
+document.addEventListener('DOMContentLoaded', function() {
+    const createRegistrationForm = document.getElementById('create-registration-form');
+    if (createRegistrationForm) {
+        createRegistrationForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                studentId: document.getElementById('registration-student').value,
+                courseId: document.getElementById('registration-course').value,
+                notes: document.getElementById('registration-notes').value.trim() || null
+            };
+            
+            if (!formData.studentId || !formData.courseId) {
+                showErrorModal('Please select both a student and a course.');
+                return;
+            }
+            
+            try {
+                showLoading(true);
+                
+                const response = await fetch(`${API_BASE_URL}/registrations`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    closeModal('create-registration-modal');
+                    showSuccessModal('Registration created successfully!');
+                    loadRegistrations(); // Refresh the list
+                } else {
+                    const errorMessage = result.message || result.title || 'Failed to create registration';
+                    showErrorModal(errorMessage);
+                }
+            } catch (error) {
+                console.error('Error creating registration:', error);
+                showErrorModal('Network error. Please check your connection and try again.');
+            } finally {
+                showLoading(false);
+            }
+        });
+    }
+});
+
+// Show registration details
+async function showRegistrationDetails(registrationId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/registrations/${registrationId}`);
+        const result = await response.json();
+        
+        if (response.ok && result.data) {
+            const registration = result.data;
+            const modal = document.getElementById('registration-details-modal');
+            const content = document.getElementById('registration-details-content');
+            
+            const studentName = registration.student ? registration.student.fullName : 'Unknown Student';
+            const studentEmail = registration.student ? registration.student.email : 'N/A';
+            const courseName = registration.course ? registration.course.courseName : 'Unknown Course';
+            const instructorName = registration.course ? registration.course.instructorName : 'N/A';
+            const statusClass = getRegistrationStatusClass(registration.status);
+            const statusText = getRegistrationStatusText(registration.status);
+            
+            content.innerHTML = `
+                <div class="course-details">
+                    <div class="detail-section">
+                        <h4><i class="fas fa-user"></i> Student Information</h4>
+                        <p><strong>Name:</strong> ${escapeHtml(studentName)}</p>
+                        <p><strong>Email:</strong> ${escapeHtml(studentEmail)}</p>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h4><i class="fas fa-book"></i> Course Information</h4>
+                        <p><strong>Course:</strong> ${escapeHtml(courseName)}</p>
+                        <p><strong>Instructor:</strong> ${escapeHtml(instructorName)}</p>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h4><i class="fas fa-info-circle"></i> Registration Details</h4>
+                        <p><strong>Registration ID:</strong> ${registration.registrationId}</p>
+                        <p><strong>Status:</strong> <span class="registration-status ${statusClass}">${statusText}</span></p>
+                        <p><strong>Registration Date:</strong> ${formatDateTime(registration.registrationDate)}</p>
+                        ${registration.grade ? `<p><strong>Grade:</strong> ${registration.grade}</p>` : ''}
+                        ${registration.notes ? `<p><strong>Notes:</strong> ${escapeHtml(registration.notes)}</p>` : ''}
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+        }
+    } catch (error) {
+        console.error('Error loading registration details:', error);
+        showErrorModal('Failed to load registration details');
+    }
+}
+
+// Apply filters
+function applyFilters() {
+    const statusFilter = document.getElementById('filter-status').value;
+    
+    let filteredRegistrations = allRegistrations;
+    
+    if (statusFilter !== '') {
+        filteredRegistrations = filteredRegistrations.filter(reg => 
+            reg.status.toString() === statusFilter
+        );
+    }
+    
+    displayRegistrations(filteredRegistrations);
+}
+
+// Refresh registrations
+function refreshRegistrations() {
+    loadRegistrations();
+}
+
+// Helper function to get registration status class
+function getRegistrationStatusClass(status) {
+    switch (status) {
+        case 0: return 'pending';
+        case 1: return 'confirmed';
+        case 2: return 'cancelled';
+        case 3: return 'completed';
+        default: return 'pending';
+    }
+}
+
+// Helper function to get registration status text
+function getRegistrationStatusText(status) {
+    switch (status) {
+        case 0: return 'Pending';
+        case 1: return 'Confirmed';
+        case 2: return 'Cancelled';
+        case 3: return 'Completed';
+        default: return 'Unknown';
+    }
+}
+
+// Update navigation to include registrations
+const originalUpdateNavigation = updateNavigation;
+function updateNavigation(activeSection = 'add') {
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => link.classList.remove('active'));
+    
+    if (activeSection === 'add') {
+        navLinks[0].classList.add('active');
+    } else if (activeSection === 'view') {
+        navLinks[1].classList.add('active');
+    } else if (activeSection === 'registrations') {
+        navLinks[3].classList.add('active');
+    }
+}
+
+// Export new functions
+window.showRegistrations = showRegistrations;
+window.showCreateRegistration = showCreateRegistration;
+window.showRegistrationDetails = showRegistrationDetails;
+window.refreshRegistrations = refreshRegistrations;
+window.applyFilters = applyFilters;

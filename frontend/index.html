@@ -30,7 +30,7 @@
                         <i class="fas fa-users"></i>
                         Students
                     </a>
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link" onclick="showRegistrations()">
                         <i class="fas fa-user-check"></i>
                         Registrations
                     </a>
@@ -214,6 +214,61 @@
                     </button>
                 </div>
             </section>
+
+            <!-- Registrations Section -->
+            <section id="registrations-section" class="section hidden">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-user-check"></i>
+                        Course Registrations
+                    </h2>
+                    <p>Manage student course registrations</p>
+                </div>
+
+                <div class="section-actions">
+                    <button class="btn btn-secondary" onclick="refreshRegistrations()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                    <button class="btn btn-primary" onclick="showCreateRegistration()">
+                        <i class="fas fa-plus"></i>
+                        New Registration
+                    </button>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <label for="filter-status">Status:</label>
+                        <select id="filter-status" class="form-input" onchange="applyFilters()">
+                            <option value="">All Statuses</option>
+                            <option value="0">Pending</option>
+                            <option value="1">Confirmed</option>
+                            <option value="2">Cancelled</option>
+                            <option value="3">Completed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="registrations-container" class="registrations-grid">
+                    <!-- Registrations will be loaded here dynamically -->
+                </div>
+
+                <div id="registrations-loading" class="loading hidden">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    Loading registrations...
+                </div>
+
+                <div id="registrations-empty" class="empty-state hidden">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>No registrations found</h3>
+                    <p>Create the first registration to get started!</p>
+                    <button class="btn btn-primary" onclick="showCreateRegistration()">
+                        <i class="fas fa-plus"></i>
+                        Create Registration
+                    </button>
+                </div>
+            </section>
         </main>
 
         <!-- Success Modal -->
@@ -267,6 +322,85 @@
                 </div>
                 <div class="modal-body" id="course-details-content">
                     <!-- Course details will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Registration Modal -->
+        <div id="create-registration-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i class="fas fa-user-plus"></i>
+                    <h3>Create New Registration</h3>
+                    <button class="modal-close" onclick="closeModal('create-registration-modal')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="create-registration-form" class="form">
+                        <div class="form-group">
+                            <label for="registration-student" class="form-label">
+                                <i class="fas fa-user"></i>
+                                Student *
+                            </label>
+                            <select id="registration-student" name="studentId" class="form-input" required>
+                                <option value="">Select a student...</option>
+                            </select>
+                            <div class="error-message" id="registration-student-error"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="registration-course" class="form-label">
+                                <i class="fas fa-book"></i>
+                                Course *
+                            </label>
+                            <select id="registration-course" name="courseId" class="form-input" required>
+                                <option value="">Select a course...</option>
+                            </select>
+                            <div class="error-message" id="registration-course-error"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="registration-notes" class="form-label">
+                                <i class="fas fa-sticky-note"></i>
+                                Notes (Optional)
+                            </label>
+                            <textarea 
+                                id="registration-notes" 
+                                name="notes" 
+                                class="form-textarea" 
+                                placeholder="Any additional notes about this registration..."
+                                rows="3"
+                            ></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal('create-registration-modal')">
+                                <i class="fas fa-times"></i>
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="create-registration-btn">
+                                <i class="fas fa-plus"></i>
+                                Create Registration
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration Details Modal -->
+        <div id="registration-details-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i class="fas fa-info-circle"></i>
+                    <h3>Registration Details</h3>
+                    <button class="modal-close" onclick="closeModal('registration-details-modal')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body" id="registration-details-content">
+                    <!-- Registration details will be loaded here -->
                 </div>
             </div>
         </div>
