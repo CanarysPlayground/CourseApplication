@@ -70,3 +70,4 @@ applyTo: '**'
 - Implement automated code quality gates
 - Use semantic versioning for releases
 - Automate deployment to staging and production environments
+- Maintain rollback strategies for deployments
