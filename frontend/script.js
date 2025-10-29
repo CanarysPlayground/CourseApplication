@@ -351,6 +351,8 @@ function updateNavigation(activeSection = 'add') {
         navLinks[0].classList.add('active');
     } else if (activeSection === 'view') {
         navLinks[1].classList.add('active');
+    } else if (activeSection === 'registrations') {
+        navLinks[3].classList.add('active');
     }
 }
 
@@ -891,21 +893,6 @@ function getRegistrationStatusText(status) {
         case 2: return 'Cancelled';
         case 3: return 'Completed';
         default: return 'Unknown';
-    }
-}
-
-// Update navigation to include registrations
-const originalUpdateNavigation = updateNavigation;
-function updateNavigation(activeSection = 'add') {
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => link.classList.remove('active'));
-    
-    if (activeSection === 'add') {
-        navLinks[0].classList.add('active');
-    } else if (activeSection === 'view') {
-        navLinks[1].classList.add('active');
-    } else if (activeSection === 'registrations') {
-        navLinks[3].classList.add('active');
     }
 }
 
