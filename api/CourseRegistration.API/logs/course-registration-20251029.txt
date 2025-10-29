@@ -220,3 +220,50 @@
 2025-10-29 12:28:39.229 +00:00 [INF] Executed action CourseRegistration.API.Controllers.RegistrationsController.GetRegistrations (CourseRegistration.API) in 4.0207ms
 2025-10-29 12:28:39.229 +00:00 [INF] Executed endpoint 'CourseRegistration.API.Controllers.RegistrationsController.GetRegistrations (CourseRegistration.API)'
 2025-10-29 12:28:39.229 +00:00 [INF] Request finished HTTP/1.1 GET http://localhost:5210/api/registrations?pageSize=100 - 200 null application/json; charset=utf-8 5.4619ms
+2025-10-29 12:50:48.206 +00:00 [INF] Saved 0 entities to in-memory store.
+2025-10-29 12:50:48.353 +00:00 [INF] Seeding database with sample data...
+2025-10-29 12:50:48.443 +00:00 [INF] Saved 4 entities to in-memory store.
+2025-10-29 12:50:48.468 +00:00 [INF] Saved 5 entities to in-memory store.
+2025-10-29 12:50:48.504 +00:00 [INF] Saved 5 entities to in-memory store.
+2025-10-29 12:50:48.505 +00:00 [INF] Database seeded successfully with 4 students, 5 courses, and 5 registrations.
+2025-10-29 12:50:48.704 +00:00 [INF] Now listening on: http://localhost:5210
+2025-10-29 12:50:48.707 +00:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-10-29 12:50:48.708 +00:00 [INF] Hosting environment: Development
+2025-10-29 12:50:48.708 +00:00 [INF] Content root path: /home/runner/work/CourseApplication/CourseApplication/api/CourseRegistration.API
+2025-10-29 12:51:30.308 +00:00 [INF] Request starting HTTP/1.1 GET http://localhost:5210/api/courses?pageSize=100 - null null
+2025-10-29 12:51:30.357 +00:00 [INF] CORS policy execution successful.
+2025-10-29 12:51:30.358 +00:00 [WRN] Failed to determine the https port for redirect.
+2025-10-29 12:51:30.360 +00:00 [INF] Executing endpoint 'CourseRegistration.API.Controllers.CoursesController.GetCourses (CourseRegistration.API)'
+2025-10-29 12:51:30.377 +00:00 [INF] Route matched with {action = "GetCourses", controller = "Courses"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[CourseRegistration.Application.DTOs.ApiResponseDto`1[CourseRegistration.Application.DTOs.PagedResponseDto`1[CourseRegistration.Application.DTOs.CourseDto]]]] GetCourses(Int32, Int32, System.String, System.String) on controller CourseRegistration.API.Controllers.CoursesController (CourseRegistration.API).
+2025-10-29 12:51:30.534 +00:00 [INF] Getting courses with page: 1, pageSize: 100, searchTerm: null, instructor: null
+2025-10-29 12:51:30.639 +00:00 [INF] Executing OkObjectResult, writing value of type 'CourseRegistration.Application.DTOs.ApiResponseDto`1[[CourseRegistration.Application.DTOs.PagedResponseDto`1[[CourseRegistration.Application.DTOs.CourseDto, CourseRegistration.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], CourseRegistration.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-10-29 12:51:30.686 +00:00 [INF] Executed action CourseRegistration.API.Controllers.CoursesController.GetCourses (CourseRegistration.API) in 305.6833ms
+2025-10-29 12:51:30.702 +00:00 [INF] Executed endpoint 'CourseRegistration.API.Controllers.CoursesController.GetCourses (CourseRegistration.API)'
+2025-10-29 12:51:30.706 +00:00 [INF] Request finished HTTP/1.1 GET http://localhost:5210/api/courses?pageSize=100 - 200 null application/json; charset=utf-8 398.8228ms
+2025-10-29 12:51:40.428 +00:00 [INF] Request starting HTTP/1.1 GET http://localhost:5210/api/registrations?pageSize=100 - null null
+2025-10-29 12:51:40.432 +00:00 [INF] CORS policy execution successful.
+2025-10-29 12:51:40.432 +00:00 [INF] Executing endpoint 'CourseRegistration.API.Controllers.RegistrationsController.GetRegistrations (CourseRegistration.API)'
+2025-10-29 12:51:40.439 +00:00 [INF] Route matched with {action = "GetRegistrations", controller = "Registrations"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[CourseRegistration.Application.DTOs.ApiResponseDto`1[CourseRegistration.Application.DTOs.PagedResponseDto`1[CourseRegistration.Application.DTOs.RegistrationDto]]]] GetRegistrations(Int32, Int32, System.Nullable`1[System.Guid], System.Nullable`1[System.Guid], System.Nullable`1[CourseRegistration.Domain.Enums.RegistrationStatus]) on controller CourseRegistration.API.Controllers.RegistrationsController (CourseRegistration.API).
+2025-10-29 12:51:40.443 +00:00 [INF] Getting registrations with page: 1, pageSize: 100, studentId: null, courseId: null, status: null
+2025-10-29 12:51:40.541 +00:00 [INF] Executing OkObjectResult, writing value of type 'CourseRegistration.Application.DTOs.ApiResponseDto`1[[CourseRegistration.Application.DTOs.PagedResponseDto`1[[CourseRegistration.Application.DTOs.RegistrationDto, CourseRegistration.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], CourseRegistration.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-10-29 12:51:40.561 +00:00 [INF] Executed action CourseRegistration.API.Controllers.RegistrationsController.GetRegistrations (CourseRegistration.API) in 121.6714ms
+2025-10-29 12:51:40.562 +00:00 [INF] Executed endpoint 'CourseRegistration.API.Controllers.RegistrationsController.GetRegistrations (CourseRegistration.API)'
+2025-10-29 12:51:40.562 +00:00 [INF] Request finished HTTP/1.1 GET http://localhost:5210/api/registrations?pageSize=100 - 200 null application/json; charset=utf-8 133.6678ms
+2025-10-29 12:51:52.326 +00:00 [INF] Request starting HTTP/1.1 GET http://localhost:5210/api/students?pageSize=100 - null null
+2025-10-29 12:51:52.328 +00:00 [INF] CORS policy execution successful.
+2025-10-29 12:51:52.328 +00:00 [INF] Executing endpoint 'CourseRegistration.API.Controllers.StudentsController.GetStudents (CourseRegistration.API)'
+2025-10-29 12:51:52.332 +00:00 [INF] Route matched with {action = "GetStudents", controller = "Students"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[CourseRegistration.Application.DTOs.ApiResponseDto`1[CourseRegistration.Application.DTOs.PagedResponseDto`1[CourseRegistration.Application.DTOs.StudentDto]]]] GetStudents(Int32, Int32) on controller CourseRegistration.API.Controllers.StudentsController (CourseRegistration.API).
+2025-10-29 12:51:52.334 +00:00 [INF] Getting students with page: 1, pageSize: 100
+2025-10-29 12:51:52.349 +00:00 [INF] Executing OkObjectResult, writing value of type 'CourseRegistration.Application.DTOs.ApiResponseDto`1[[CourseRegistration.Application.DTOs.PagedResponseDto`1[[CourseRegistration.Application.DTOs.StudentDto, CourseRegistration.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], CourseRegistration.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-10-29 12:51:52.352 +00:00 [INF] Executed action CourseRegistration.API.Controllers.StudentsController.GetStudents (CourseRegistration.API) in 19.6797ms
+2025-10-29 12:51:52.352 +00:00 [INF] Executed endpoint 'CourseRegistration.API.Controllers.StudentsController.GetStudents (CourseRegistration.API)'
+2025-10-29 12:51:52.352 +00:00 [INF] Request finished HTTP/1.1 GET http://localhost:5210/api/students?pageSize=100 - 200 null application/json; charset=utf-8 26.1635ms
+2025-10-29 12:51:52.359 +00:00 [INF] Request starting HTTP/1.1 GET http://localhost:5210/api/courses?pageSize=100 - null null
+2025-10-29 12:51:52.360 +00:00 [INF] CORS policy execution successful.
+2025-10-29 12:51:52.360 +00:00 [INF] Executing endpoint 'CourseRegistration.API.Controllers.CoursesController.GetCourses (CourseRegistration.API)'
+2025-10-29 12:51:52.360 +00:00 [INF] Route matched with {action = "GetCourses", controller = "Courses"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[CourseRegistration.Application.DTOs.ApiResponseDto`1[CourseRegistration.Application.DTOs.PagedResponseDto`1[CourseRegistration.Application.DTOs.CourseDto]]]] GetCourses(Int32, Int32, System.String, System.String) on controller CourseRegistration.API.Controllers.CoursesController (CourseRegistration.API).
+2025-10-29 12:51:52.361 +00:00 [INF] Getting courses with page: 1, pageSize: 100, searchTerm: null, instructor: null
+2025-10-29 12:51:52.365 +00:00 [INF] Executing OkObjectResult, writing value of type 'CourseRegistration.Application.DTOs.ApiResponseDto`1[[CourseRegistration.Application.DTOs.PagedResponseDto`1[[CourseRegistration.Application.DTOs.CourseDto, CourseRegistration.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], CourseRegistration.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-10-29 12:51:52.365 +00:00 [INF] Executed action CourseRegistration.API.Controllers.CoursesController.GetCourses (CourseRegistration.API) in 4.8863ms
+2025-10-29 12:51:52.366 +00:00 [INF] Executed endpoint 'CourseRegistration.API.Controllers.CoursesController.GetCourses (CourseRegistration.API)'
+2025-10-29 12:51:52.366 +00:00 [INF] Request finished HTTP/1.1 GET http://localhost:5210/api/courses?pageSize=100 - 200 null application/json; charset=utf-8 6.9757ms
