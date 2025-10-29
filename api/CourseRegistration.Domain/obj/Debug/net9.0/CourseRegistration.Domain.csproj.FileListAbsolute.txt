@@ -1,0 +1,11 @@
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Domain\bin\Debug\net9.0\CourseRegistration.Domain.deps.json
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Domain\bin\Debug\net9.0\CourseRegistration.Domain.dll
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Domain\bin\Debug\net9.0\CourseRegistration.Domain.pdb
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Domain\obj\Debug\net9.0\CourseRegistration.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Domain\obj\Debug\net9.0\CourseRegistration.Domain.AssemblyInfoInputs.cache
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Domain\obj\Debug\net9.0\CourseRegistration.Domain.AssemblyInfo.cs
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Domain\obj\Debug\net9.0\CourseRegistration.Domain.csproj.CoreCompileInputs.cache
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Domain\obj\Debug\net9.0\CourseRegistration.Domain.dll
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Domain\obj\Debug\net9.0\refint\CourseRegistration.Domain.dll
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Domain\obj\Debug\net9.0\CourseRegistration.Domain.pdb
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Domain\obj\Debug\net9.0\ref\CourseRegistration.Domain.dll

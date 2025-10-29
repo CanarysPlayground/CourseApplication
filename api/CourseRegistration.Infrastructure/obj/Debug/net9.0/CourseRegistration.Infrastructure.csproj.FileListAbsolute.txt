@@ -1,0 +1,15 @@
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Infrastructure\obj\Debug\net9.0\CourseRegistration.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Infrastructure\obj\Debug\net9.0\CourseRegistration.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Infrastructure\obj\Debug\net9.0\CourseRegistration.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Infrastructure\obj\Debug\net9.0\CourseRegistration.Infrastructure.AssemblyInfo.cs
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Infrastructure\obj\Debug\net9.0\CourseRegistration.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Infrastructure\bin\Debug\net9.0\CourseRegistration.Infrastructure.deps.json
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Infrastructure\bin\Debug\net9.0\CourseRegistration.Infrastructure.dll
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Infrastructure\bin\Debug\net9.0\CourseRegistration.Infrastructure.pdb
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Infrastructure\bin\Debug\net9.0\CourseRegistration.Domain.dll
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Infrastructure\bin\Debug\net9.0\CourseRegistration.Domain.pdb
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Infrastructure\obj\Debug\net9.0\CourseRe.B405D5CC.Up2Date
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Infrastructure\obj\Debug\net9.0\CourseRegistration.Infrastructure.dll
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Infrastructure\obj\Debug\net9.0\refint\CourseRegistration.Infrastructure.dll
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Infrastructure\obj\Debug\net9.0\CourseRegistration.Infrastructure.pdb
+C:\Users\kavyashrias\Documents\CourseApplication\api\CourseRegistration.Infrastructure\obj\Debug\net9.0\ref\CourseRegistration.Infrastructure.dll
