@@ -47,3 +47,4 @@ bld/
 project.lock.json
 project.fragment.lock.json
 artifacts/
+api/CourseRegistration.API/logs/
