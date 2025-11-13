@@ -1,0 +1,30 @@
+using System.Collections.Generic;
+using System.Linq;
+
+namespace CourseApplication.Services
+{
+    public class CourseSearchService
+    {
+        private readonly ApplicationDbContext _context;
+
+        public CourseSearchService(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        /// <summary>
+        /// Searches for courses by keyword.
+        /// </summary>
+        /// <param name="keyword">The search keyword (in title or description).</param>
+        /// <returns>List of matching courses.</returns>
+        public List<Course> SearchCourses(string keyword)
+        {
+            if (string.IsNullOrEmpty(keyword))
+                return new List<Course>();
+
+            return _context.Courses
+                .Where(c => c.Title.Contains(keyword) || c.Description.Contains(keyword))
+                .ToList();
+        }
+    }
+}
