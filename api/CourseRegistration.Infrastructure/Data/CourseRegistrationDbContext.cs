@@ -42,70 +42,70 @@ public class CourseRegistrationDbContext : DbContext
         // Configure Student entity
         modelBuilder.Entity<Student>(entity =>
         {
-            entity.HasKey(s => s.StudentId);
-            entity.HasIndex(s => s.Email).IsUnique();
-            entity.Property(s => s.FirstName).IsRequired().HasMaxLength(50);
-            entity.Property(s => s.LastName).IsRequired().HasMaxLength(50);
-            entity.Property(s => s.Email).IsRequired().HasMaxLength(256);
-            entity.Property(s => s.PhoneNumber).HasMaxLength(20);
-            entity.Property(s => s.DateOfBirth).IsRequired();
-            entity.Property(s => s.CreatedAt).IsRequired();
-            entity.Property(s => s.UpdatedAt).IsRequired();
-            entity.Property(s => s.IsActive).IsRequired();
+            entity.HasKey(student => student.StudentId);
+            entity.HasIndex(student => student.Email).IsUnique();
+            entity.Property(student => student.FirstName).IsRequired().HasMaxLength(50);
+            entity.Property(student => student.LastName).IsRequired().HasMaxLength(50);
+            entity.Property(student => student.Email).IsRequired().HasMaxLength(256);
+            entity.Property(student => student.PhoneNumber).HasMaxLength(20);
+            entity.Property(student => student.DateOfBirth).IsRequired();
+            entity.Property(student => student.CreatedAt).IsRequired();
+            entity.Property(student => student.UpdatedAt).IsRequired();
+            entity.Property(student => student.IsActive).IsRequired();
 
             // Configure relationships
-            entity.HasMany(s => s.Registrations)
-                  .WithOne(r => r.Student)
-                  .HasForeignKey(r => r.StudentId)
+            entity.HasMany(student => student.Registrations)
+                  .WithOne(registration => registration.Student)
+                  .HasForeignKey(registration => registration.StudentId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
         // Configure Course entity
         modelBuilder.Entity<Course>(entity =>
         {
-            entity.HasKey(c => c.CourseId);
-            entity.Property(c => c.CourseName).IsRequired().HasMaxLength(100);
-            entity.Property(c => c.Description).HasMaxLength(500);
-            entity.Property(c => c.InstructorName).IsRequired().HasMaxLength(100);
-            entity.Property(c => c.StartDate).IsRequired();
-            entity.Property(c => c.EndDate).IsRequired();
-            entity.Property(c => c.Schedule).IsRequired().HasMaxLength(100);
-            entity.Property(c => c.IsActive).IsRequired();
-            entity.Property(c => c.CreatedAt).IsRequired();
-            entity.Property(c => c.UpdatedAt).IsRequired();
+            entity.HasKey(course => course.CourseId);
+            entity.Property(course => course.CourseName).IsRequired().HasMaxLength(100);
+            entity.Property(course => course.Description).HasMaxLength(500);
+            entity.Property(course => course.InstructorName).IsRequired().HasMaxLength(100);
+            entity.Property(course => course.StartDate).IsRequired();
+            entity.Property(course => course.EndDate).IsRequired();
+            entity.Property(course => course.Schedule).IsRequired().HasMaxLength(100);
+            entity.Property(course => course.IsActive).IsRequired();
+            entity.Property(course => course.CreatedAt).IsRequired();
+            entity.Property(course => course.UpdatedAt).IsRequired();
 
             // Configure relationships
-            entity.HasMany(c => c.Registrations)
-                  .WithOne(r => r.Course)
-                  .HasForeignKey(r => r.CourseId)
+            entity.HasMany(course => course.Registrations)
+                  .WithOne(registration => registration.Course)
+                  .HasForeignKey(registration => registration.CourseId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
         // Configure Registration entity
         modelBuilder.Entity<Registration>(entity =>
         {
-            entity.HasKey(r => r.RegistrationId);
-            entity.Property(r => r.StudentId).IsRequired();
-            entity.Property(r => r.CourseId).IsRequired();
-            entity.Property(r => r.RegistrationDate).IsRequired();
-            entity.Property(r => r.Status).IsRequired()
+            entity.HasKey(registration => registration.RegistrationId);
+            entity.Property(registration => registration.StudentId).IsRequired();
+            entity.Property(registration => registration.CourseId).IsRequired();
+            entity.Property(registration => registration.RegistrationDate).IsRequired();
+            entity.Property(registration => registration.Status).IsRequired()
                   .HasConversion<string>();
-            entity.Property(r => r.Grade).HasConversion<string>();
-            entity.Property(r => r.Notes).HasMaxLength(200);
+            entity.Property(registration => registration.Grade).HasConversion<string>();
+            entity.Property(registration => registration.Notes).HasMaxLength(200);
 
             // Create unique constraint to prevent duplicate registrations
-            entity.HasIndex(r => new { r.StudentId, r.CourseId })
+            entity.HasIndex(registration => new { registration.StudentId, registration.CourseId })
                   .IsUnique();
 
             // Configure relationships
-            entity.HasOne(r => r.Student)
-                  .WithMany(s => s.Registrations)
-                  .HasForeignKey(r => r.StudentId)
+            entity.HasOne(registration => registration.Student)
+                  .WithMany(student => student.Registrations)
+                  .HasForeignKey(registration => registration.StudentId)
                   .OnDelete(DeleteBehavior.Cascade);
 
-            entity.HasOne(r => r.Course)
-                  .WithMany(c => c.Registrations)
-                  .HasForeignKey(r => r.CourseId)
+            entity.HasOne(registration => registration.Course)
+                  .WithMany(course => course.Registrations)
+                  .HasForeignKey(registration => registration.CourseId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
     }
@@ -134,7 +134,7 @@ public class CourseRegistrationDbContext : DbContext
     private void UpdateTimestamps()
     {
         var entries = ChangeTracker.Entries()
-            .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+            .Where(entry => entry.State == EntityState.Added || entry.State == EntityState.Modified);
 
         var currentTime = DateTime.UtcNow;
 

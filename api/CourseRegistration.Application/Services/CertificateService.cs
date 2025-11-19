@@ -91,7 +91,7 @@ public class CertificateService : ICertificateService
     {
         await Task.CompletedTask; // Simulate async operation
         
-        var certificates = _certificates.Where(c => c.StudentId == studentId);
+        var certificates = _certificates.Where(certificate => certificate.StudentId == studentId);
         return certificates.Select(MapToDto);
     }
 
@@ -99,7 +99,7 @@ public class CertificateService : ICertificateService
     {
         await Task.CompletedTask; // Simulate async operation
         
-        var certificate = _certificates.FirstOrDefault(c => c.CertificateId == certificateId);
+        var certificate = _certificates.FirstOrDefault(cert => cert.CertificateId == certificateId);
         return certificate != null ? MapToDto(certificate) : null;
     }
 
@@ -107,15 +107,15 @@ public class CertificateService : ICertificateService
     {
         await Task.CompletedTask; // Simulate async operation
         
-        var matchingStudents = _students.Where(s => 
-            $"{s.FirstName} {s.LastName}".Contains(studentName, StringComparison.OrdinalIgnoreCase) ||
-            s.FirstName.Contains(studentName, StringComparison.OrdinalIgnoreCase) ||
-            s.LastName.Contains(studentName, StringComparison.OrdinalIgnoreCase));
+        var matchingStudents = _students.Where(student => 
+            $"{student.FirstName} {student.LastName}".Contains(studentName, StringComparison.OrdinalIgnoreCase) ||
+            student.FirstName.Contains(studentName, StringComparison.OrdinalIgnoreCase) ||
+            student.LastName.Contains(studentName, StringComparison.OrdinalIgnoreCase));
 
         var certificates = new List<Certificate>();
         foreach (var student in matchingStudents)
         {
-            certificates.AddRange(_certificates.Where(c => c.StudentId == student.StudentId));
+            certificates.AddRange(_certificates.Where(certificate => certificate.StudentId == student.StudentId));
         }
 
         return certificates.Select(MapToDto);
@@ -150,8 +150,8 @@ public class CertificateService : ICertificateService
 
     private CertificateDto MapToDto(Certificate certificate)
     {
-        var student = _students.FirstOrDefault(s => s.StudentId == certificate.StudentId);
-        var course = _courses.FirstOrDefault(c => c.CourseId == certificate.CourseId);
+        var student = _students.FirstOrDefault(stud => stud.StudentId == certificate.StudentId);
+        var course = _courses.FirstOrDefault(crs => crs.CourseId == certificate.CourseId);
 
         return new CertificateDto
         {
