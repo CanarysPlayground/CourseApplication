@@ -257,17 +257,15 @@ public class AdminAccessServiceTests
     }
 
     [Fact]
-    public async Task HasAdminAccessAsync_WithValidGuid_ReturnsFalseForNow()
+    public async Task HasAdminAccessAsync_WithValidGuid_ThrowsNotImplementedException()
     {
-        // This test validates current behavior - method returns false without DB context
+        // This test validates current behavior - method throws NotImplementedException
         // Arrange
         var userId = Guid.NewGuid();
 
-        // Act
-        var result = await _service.HasAdminAccessAsync(userId);
-
-        // Assert
-        Assert.False(result);
+        // Act & Assert
+        await Assert.ThrowsAsync<NotImplementedException>(
+            async () => await _service.HasAdminAccessAsync(userId));
     }
 
     [Fact]
@@ -365,6 +363,8 @@ public class AdminAccessServiceTests
         var user = new User
         {
             UserId = Guid.NewGuid(),
+            Username = "adminuser",
+            Email = "admin@minimal.com",
             Role = UserRole.Admin,
             IsActive = true
         };

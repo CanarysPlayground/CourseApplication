@@ -12,7 +12,7 @@ public class User
     /// Unique identifier for the user
     /// </summary>
     [Key]
-    public Guid UserId { get; set; } = Guid.NewGuid();
+    public Guid UserId { get; set; }
 
     /// <summary>
     /// User's username (must be unique)
@@ -43,10 +43,10 @@ public class User
     /// <summary>
     /// Date when the user account was created
     /// </summary>
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; }
 
     /// <summary>
     /// Date when the user account was last updated
     /// </summary>
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; }
 }

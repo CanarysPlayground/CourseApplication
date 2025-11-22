@@ -66,6 +66,7 @@ public class AdminAccessService : IAdminAccessService
     /// </summary>
     /// <param name="userId">The user ID to check</param>
     /// <returns>True if the user has admin access, false otherwise</returns>
+    /// <exception cref="NotImplementedException">This method requires database context and is not yet implemented</exception>
     public Task<bool> HasAdminAccessAsync(Guid userId)
     {
         // Security: Validate user ID
@@ -75,9 +76,7 @@ public class AdminAccessService : IAdminAccessService
             return Task.FromResult(false);
         }
 
-        // Note: In a real implementation, this would query the database
-        // For now, returning false as this requires database context
-        _logger.LogWarning("HasAdminAccessAsync called but not fully implemented without database context");
-        return Task.FromResult(false);
+        // Note: This method requires database context to query the user
+        throw new NotImplementedException("This method requires database context and is not yet implemented. Use HasAdminAccess with a User object instead.");
     }
 }
