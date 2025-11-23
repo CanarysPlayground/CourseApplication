@@ -98,7 +98,7 @@ public class CourseRepository : Repository<Course>, ICourseRepository
     }
 
     /// <summary>
-    /// Override GetPagedAsync to only return active courses
+    /// Override GetPagedAsync to only return active courses with registrations
     /// </summary>
     public override async Task<IEnumerable<Course>> GetPagedAsync(int page, int pageSize)
     {
@@ -107,6 +107,8 @@ public class CourseRepository : Repository<Course>, ICourseRepository
         if (pageSize > 100) pageSize = 100;
 
         return await _dbSet
+            .Include(c => c.Registrations)
+            .Include(c => c.WaitlistEntries)
             .Where(c => c.IsActive)
             .OrderBy(c => c.CourseName)
             .Skip((page - 1) * pageSize)
@@ -115,11 +117,13 @@ public class CourseRepository : Repository<Course>, ICourseRepository
     }
 
     /// <summary>
-    /// Override GetByIdAsync to only return active courses
+    /// Override GetByIdAsync to only return active courses with registrations
     /// </summary>
     public override async Task<Course?> GetByIdAsync(Guid id)
     {
         return await _dbSet
+            .Include(c => c.Registrations)
+            .Include(c => c.WaitlistEntries)
             .Where(c => c.IsActive)
             .FirstOrDefaultAsync(c => c.CourseId == id);
     }
