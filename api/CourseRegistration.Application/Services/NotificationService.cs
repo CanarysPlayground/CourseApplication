@@ -53,7 +53,7 @@ public class NotificationService : INotificationService
     /// <summary>
     /// Sends an email notification (simulated for now)
     /// </summary>
-    public async Task SendEmailAsync(string toEmail, string subject, string body)
+    public Task SendEmailAsync(string toEmail, string subject, string body)
     {
         // In a real implementation, this would integrate with an email service like SendGrid, AWS SES, etc.
         // For now, we'll just log the email
@@ -62,17 +62,17 @@ public class NotificationService : INotificationService
                                $"Subject: {subject}\n" +
                                $"Body: {body}");
 
-        await Task.CompletedTask;
+        return Task.CompletedTask;
     }
 
     /// <summary>
     /// Sends an in-app notification (placeholder for future implementation)
     /// </summary>
-    public async Task SendInAppNotificationAsync(Guid studentId, string message)
+    public Task SendInAppNotificationAsync(Guid studentId, string message)
     {
         // Placeholder for future implementation
         // This would typically store a notification in a database or send via SignalR/WebSocket
         _logger.LogInformation($"In-app notification for student {studentId}: {message}");
-        await Task.CompletedTask;
+        return Task.CompletedTask;
     }
 }

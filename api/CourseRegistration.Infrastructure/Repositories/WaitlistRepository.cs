@@ -68,11 +68,16 @@ public class WaitlistRepository : Repository<WaitlistEntry>, IWaitlistRepository
     /// </summary>
     public async Task<int> GetNextPositionAsync(Guid courseId)
     {
-        var maxPosition = await _context.WaitlistEntries
+        var activeEntries = await _context.WaitlistEntries
             .Where(w => w.CourseId == courseId && w.IsActive)
-            .MaxAsync(w => (int?)w.Position);
+            .ToListAsync();
 
-        return (maxPosition ?? 0) + 1;
+        if (!activeEntries.Any())
+        {
+            return 1;
+        }
+
+        return activeEntries.Max(w => w.Position) + 1;
     }
 
     /// <summary>

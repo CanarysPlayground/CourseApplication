@@ -252,6 +252,21 @@ public class WaitlistService : IWaitlistService
         var waitlistEntries = await _unitOfWork.Waitlists.GetActiveWaitlistForCourseAsync(courseId);
         var entriesList = waitlistEntries.ToList();
 
+        // Validate that all entries are included in the reorder
+        if (newPositions.Count != entriesList.Count)
+        {
+            throw new InvalidOperationException(
+                $"All waitlist entries must be included. Expected {entriesList.Count} positions but got {newPositions.Count}.");
+        }
+
+        // Validate that all entry IDs are present
+        var missingEntries = entriesList.Where(e => !newPositions.ContainsKey(e.WaitlistEntryId)).ToList();
+        if (missingEntries.Any())
+        {
+            throw new InvalidOperationException(
+                $"Missing position assignments for {missingEntries.Count} waitlist entry/entries.");
+        }
+
         // Validate that all positions are unique and sequential
         var positions = newPositions.Values.OrderBy(p => p).ToList();
         for (int i = 0; i < positions.Count; i++)
@@ -265,10 +280,7 @@ public class WaitlistService : IWaitlistService
         // Update positions
         foreach (var entry in entriesList)
         {
-            if (newPositions.TryGetValue(entry.WaitlistEntryId, out int newPosition))
-            {
-                entry.Position = newPosition;
-            }
+            entry.Position = newPositions[entry.WaitlistEntryId];
         }
 
         await _unitOfWork.SaveChangesAsync();
