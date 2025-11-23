@@ -68,6 +68,8 @@ applyTo: '**'
 ## CI/CD Integration
 - Configure GitHub Actions workflows for build, test, and deployment
 - Implement automated code quality gates
+
 - Use semantic versioning for releases
 - Automate deployment to staging and production environments
 - Maintain rollback strategies for deployments
+
