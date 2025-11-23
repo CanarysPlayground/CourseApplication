@@ -33,6 +33,11 @@ public class CourseRegistrationDbContext : DbContext
     public DbSet<Registration> Registrations { get; set; } = null!;
 
     /// <summary>
+    /// WaitlistEntries DbSet
+    /// </summary>
+    public DbSet<WaitlistEntry> WaitlistEntries { get; set; } = null!;
+
+    /// <summary>
     /// Configures the model relationships and constraints
     /// </summary>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -58,6 +63,11 @@ public class CourseRegistrationDbContext : DbContext
                   .WithOne(r => r.Student)
                   .HasForeignKey(r => r.StudentId)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(s => s.WaitlistEntries)
+                  .WithOne(w => w.Student)
+                  .HasForeignKey(w => w.StudentId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         // Configure Course entity
@@ -70,6 +80,7 @@ public class CourseRegistrationDbContext : DbContext
             entity.Property(c => c.StartDate).IsRequired();
             entity.Property(c => c.EndDate).IsRequired();
             entity.Property(c => c.Schedule).IsRequired().HasMaxLength(100);
+            entity.Property(c => c.MaxEnrollment).IsRequired();
             entity.Property(c => c.IsActive).IsRequired();
             entity.Property(c => c.CreatedAt).IsRequired();
             entity.Property(c => c.UpdatedAt).IsRequired();
@@ -78,6 +89,11 @@ public class CourseRegistrationDbContext : DbContext
             entity.HasMany(c => c.Registrations)
                   .WithOne(r => r.Course)
                   .HasForeignKey(r => r.CourseId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(c => c.WaitlistEntries)
+                  .WithOne(w => w.Course)
+                  .HasForeignKey(w => w.CourseId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -106,6 +122,35 @@ public class CourseRegistrationDbContext : DbContext
             entity.HasOne(r => r.Course)
                   .WithMany(c => c.Registrations)
                   .HasForeignKey(r => r.CourseId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure WaitlistEntry entity
+        modelBuilder.Entity<WaitlistEntry>(entity =>
+        {
+            entity.HasKey(w => w.WaitlistEntryId);
+            entity.Property(w => w.StudentId).IsRequired();
+            entity.Property(w => w.CourseId).IsRequired();
+            entity.Property(w => w.JoinedAt).IsRequired();
+            entity.Property(w => w.Position).IsRequired();
+            entity.Property(w => w.NotificationPreference).IsRequired()
+                  .HasConversion<string>();
+            entity.Property(w => w.IsActive).IsRequired();
+            entity.Property(w => w.Notes).HasMaxLength(500);
+
+            // Create index for querying active waitlist entries
+            // Note: Only one active waitlist entry per student per course should exist
+            entity.HasIndex(w => new { w.StudentId, w.CourseId, w.IsActive });
+
+            // Configure relationships
+            entity.HasOne(w => w.Student)
+                  .WithMany(s => s.WaitlistEntries)
+                  .HasForeignKey(w => w.StudentId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(w => w.Course)
+                  .WithMany(c => c.WaitlistEntries)
+                  .HasForeignKey(w => w.CourseId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
     }
