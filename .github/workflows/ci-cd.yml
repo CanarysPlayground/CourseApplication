@@ -1,0 +1,69 @@
+name: Build, Test, and Deploy Course Registration API
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  API_PROJECT: 'api/CourseRegistration.API/CourseRegistration.API.csproj'
+  TEST_PROJECT: 'api/CourseRegistration.Tests/CourseRegistration.Tests.csproj'
+  AZURE_WEBAPP_NAME: 'YOUR-APP-SERVICE-NAME'   # TODO: change
+  AZURE_WEBAPP_PACKAGE_PATH: 'publish'         # Folder created by dotnet publish
+
+jobs:
+  build-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Restore dependencies
+      run: dotnet restore api/CourseRegistration.sln
+
+    - name: Build
+      run: dotnet build api/CourseRegistration.sln --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test ${{ env.TEST_PROJECT }} --configuration Release --no-build --logger trx
+
+  deploy:
+    name: Deploy to Azure Web App
+    needs: build-test
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Publish .NET API
+      run: |
+        dotnet restore ${{ env.API_PROJECT }}
+        dotnet publish ${{ env.API_PROJECT }} -c Release -o ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
+    - name: Deploy to Azure Web App
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        slot-name: 'production'
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
