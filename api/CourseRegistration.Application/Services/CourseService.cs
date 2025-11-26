@@ -44,7 +44,7 @@ public class CourseService : ICourseService
         else
         {
             courses = await _unitOfWork.Courses.GetPagedAsync(page, pageSize);
-            totalCourses = await _unitOfWork.Courses.CountAsync(c => ((Course)c).IsActive);
+            totalCourses = await _unitOfWork.Courses.CountAsync(course => ((Course)course).IsActive);
         }
 
         var courseDtos = _mapper.Map<IEnumerable<CourseDto>>(courses);
@@ -129,7 +129,7 @@ public class CourseService : ICourseService
 
         // Check if course has active registrations
         var activeRegistrations = await _unitOfWork.Registrations.GetByCourseIdAsync(id);
-        if (activeRegistrations.Any(r => r.Status == Domain.Enums.RegistrationStatus.Confirmed))
+        if (activeRegistrations.Any(registration => registration.Status == Domain.Enums.RegistrationStatus.Confirmed))
         {
             throw new InvalidOperationException("Cannot delete a course with active registrations.");
         }

@@ -77,5 +77,5 @@ public class Course
     /// Computed property for current enrollment count
     /// </summary>
     [NotMapped]
-    public int CurrentEnrollment => Registrations?.Count(r => r.Status == Enums.RegistrationStatus.Confirmed) ?? 0;
+    public int CurrentEnrollment => Registrations?.Count(registration => registration.Status == Enums.RegistrationStatus.Confirmed) ?? 0;
 }
