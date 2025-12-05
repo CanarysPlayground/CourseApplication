@@ -24,8 +24,8 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     public async Task<Student?> GetByEmailAsync(string email)
     {
         return await _dbSet
-            .Where(s => s.IsActive)
-            .FirstOrDefaultAsync(s => s.Email.ToLower() == email.ToLower());
+            .Where(student => student.IsActive)
+            .FirstOrDefaultAsync(student => student.Email.ToLower() == email.ToLower());
     }
 
     /// <summary>
@@ -34,10 +34,10 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     public async Task<Student?> GetWithRegistrationsAsync(Guid studentId)
     {
         return await _dbSet
-            .Include(s => s.Registrations)
-                .ThenInclude(r => r.Course)
-            .Where(s => s.IsActive)
-            .FirstOrDefaultAsync(s => s.StudentId == studentId);
+            .Include(student => student.Registrations)
+                .ThenInclude(registration => registration.Course)
+            .Where(student => student.IsActive)
+            .FirstOrDefaultAsync(student => student.StudentId == studentId);
     }
 
     /// <summary>
@@ -50,12 +50,12 @@ public class StudentRepository : Repository<Student>, IStudentRepository
 
         var lowerSearchTerm = searchTerm.ToLower();
         return await _dbSet
-            .Where(s => s.IsActive && 
-                       (s.FirstName.ToLower().Contains(lowerSearchTerm) ||
-                        s.LastName.ToLower().Contains(lowerSearchTerm) ||
-                        s.Email.ToLower().Contains(lowerSearchTerm)))
-            .OrderBy(s => s.LastName)
-            .ThenBy(s => s.FirstName)
+            .Where(student => student.IsActive && 
+                       (student.FirstName.ToLower().Contains(lowerSearchTerm) ||
+                        student.LastName.ToLower().Contains(lowerSearchTerm) ||
+                        student.Email.ToLower().Contains(lowerSearchTerm)))
+            .OrderBy(student => student.LastName)
+            .ThenBy(student => student.FirstName)
             .ToListAsync();
     }
 
@@ -65,9 +65,9 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     public async Task<IEnumerable<Student>> GetActiveStudentsAsync()
     {
         return await _dbSet
-            .Where(s => s.IsActive)
-            .OrderBy(s => s.LastName)
-            .ThenBy(s => s.FirstName)
+            .Where(student => student.IsActive)
+            .OrderBy(student => student.LastName)
+            .ThenBy(student => student.FirstName)
             .ToListAsync();
     }
 
@@ -81,9 +81,9 @@ public class StudentRepository : Repository<Student>, IStudentRepository
         if (pageSize > 100) pageSize = 100;
 
         return await _dbSet
-            .Where(s => s.IsActive)
-            .OrderBy(s => s.LastName)
-            .ThenBy(s => s.FirstName)
+            .Where(student => student.IsActive)
+            .OrderBy(student => student.LastName)
+            .ThenBy(student => student.FirstName)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -95,8 +95,8 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     public override async Task<Student?> GetByIdAsync(Guid id)
     {
         return await _dbSet
-            .Where(s => s.IsActive)
-            .FirstOrDefaultAsync(s => s.StudentId == id);
+            .Where(student => student.IsActive)
+            .FirstOrDefaultAsync(student => student.StudentId == id);
     }
 
     /// <summary>
