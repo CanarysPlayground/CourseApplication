@@ -70,6 +70,11 @@ public class Student
     public virtual ICollection<Registration> Registrations { get; set; } = new List<Registration>();
 
     /// <summary>
+    /// Navigation property for student's waitlist entries
+    /// </summary>
+    public virtual ICollection<WaitlistEntry> WaitlistEntries { get; set; } = new List<WaitlistEntry>();
+
+    /// <summary>
     /// Computed property for student's full name
     /// </summary>
     [NotMapped]

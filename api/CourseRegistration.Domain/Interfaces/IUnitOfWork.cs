@@ -21,6 +21,11 @@ public interface IUnitOfWork : IDisposable
     IRegistrationRepository Registrations { get; }
 
     /// <summary>
+    /// Waitlist repository
+    /// </summary>
+    IWaitlistRepository Waitlists { get; }
+
+    /// <summary>
     /// Saves all changes made in this unit of work asynchronously
     /// </summary>
     Task<int> SaveChangesAsync();

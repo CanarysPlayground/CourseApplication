@@ -34,6 +34,11 @@ public class CreateCourseDto
     /// Course schedule
     /// </summary>
     public string Schedule { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Maximum number of students allowed
+    /// </summary>
+    public int MaxEnrollment { get; set; } = 30;
 }
 
 /// <summary>
@@ -70,6 +75,11 @@ public class UpdateCourseDto
     /// Course schedule
     /// </summary>
     public string Schedule { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Maximum number of students allowed
+    /// </summary>
+    public int MaxEnrollment { get; set; } = 30;
 }
 
 /// <summary>
@@ -116,6 +126,21 @@ public class CourseDto
     /// Current enrollment count
     /// </summary>
     public int CurrentEnrollment { get; set; }
+
+    /// <summary>
+    /// Maximum enrollment capacity
+    /// </summary>
+    public int MaxEnrollment { get; set; }
+
+    /// <summary>
+    /// Indicates if the course is full
+    /// </summary>
+    public bool IsFull { get; set; }
+
+    /// <summary>
+    /// Number of students on the waitlist
+    /// </summary>
+    public int WaitlistCount { get; set; }
 
     /// <summary>
     /// Indicates if the course is active
