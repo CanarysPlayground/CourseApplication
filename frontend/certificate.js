@@ -1,5 +1,8 @@
 //Create a comprehensive certificate generation and display system for the Course Registration System that allows users to 
 // search for and view digital certificates for completed courses.
+
+
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';  
 import { useParams } from 'react-router-dom';
