@@ -6,6 +6,8 @@ using CourseRegistration.Domain.Enums;
 namespace CourseRegistration.Tests.Services;
 
 /// <summary>
+
+
 /// Unit tests for admin access checking functionality
 /// </summary>
 public class AdminAccessCheckerTests
