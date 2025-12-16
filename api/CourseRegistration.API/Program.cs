@@ -302,3 +302,6 @@ static async Task SeedDatabase(CourseRegistrationDbContext context)
     Log.Information("Database seeded successfully with {StudentCount} students, {CourseCount} courses, and {RegistrationCount} registrations.", 
         students.Length, courses.Length, registrations.Length);
 }
+
+// Make Program accessible for integration tests
+public partial class Program { }
