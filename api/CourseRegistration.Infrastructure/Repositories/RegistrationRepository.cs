@@ -25,10 +25,10 @@ public class RegistrationRepository : Repository<Registration>, IRegistrationRep
     public async Task<IEnumerable<Registration>> GetByStudentIdAsync(Guid studentId)
     {
         return await _dbSet
-            .Include(r => r.Course)
-            .Include(r => r.Student)
-            .Where(r => r.StudentId == studentId)
-            .OrderByDescending(r => r.RegistrationDate)
+            .Include(registration => registration.Course)
+            .Include(registration => registration.Student)
+            .Where(registration => registration.StudentId == studentId)
+            .OrderByDescending(registration => registration.RegistrationDate)
             .ToListAsync();
     }
 
@@ -38,11 +38,11 @@ public class RegistrationRepository : Repository<Registration>, IRegistrationRep
     public async Task<IEnumerable<Registration>> GetByCourseIdAsync(Guid courseId)
     {
         return await _dbSet
-            .Include(r => r.Student)
-            .Include(r => r.Course)
-            .Where(r => r.CourseId == courseId)
-            .OrderBy(r => r.Student.LastName)
-            .ThenBy(r => r.Student.FirstName)
+            .Include(registration => registration.Student)
+            .Include(registration => registration.Course)
+            .Where(registration => registration.CourseId == courseId)
+            .OrderBy(registration => registration.Student.LastName)
+            .ThenBy(registration => registration.Student.FirstName)
             .ToListAsync();
     }
 
@@ -52,10 +52,10 @@ public class RegistrationRepository : Repository<Registration>, IRegistrationRep
     public async Task<IEnumerable<Registration>> GetByStatusAsync(RegistrationStatus status)
     {
         return await _dbSet
-            .Include(r => r.Student)
-            .Include(r => r.Course)
-            .Where(r => r.Status == status)
-            .OrderByDescending(r => r.RegistrationDate)
+            .Include(registration => registration.Student)
+            .Include(registration => registration.Course)
+            .Where(registration => registration.Status == status)
+            .OrderByDescending(registration => registration.RegistrationDate)
             .ToListAsync();
     }
 
@@ -65,9 +65,9 @@ public class RegistrationRepository : Repository<Registration>, IRegistrationRep
     public async Task<bool> IsStudentRegisteredForCourseAsync(Guid studentId, Guid courseId)
     {
         return await _dbSet
-            .AnyAsync(r => r.StudentId == studentId && 
-                          r.CourseId == courseId && 
-                          r.Status != RegistrationStatus.Cancelled);
+            .AnyAsync(registration => registration.StudentId == studentId && 
+                          registration.CourseId == courseId && 
+                          registration.Status != RegistrationStatus.Cancelled);
     }
 
     /// <summary>
@@ -76,9 +76,9 @@ public class RegistrationRepository : Repository<Registration>, IRegistrationRep
     public async Task<Registration?> GetWithDetailsAsync(Guid registrationId)
     {
         return await _dbSet
-            .Include(r => r.Student)
-            .Include(r => r.Course)
-            .FirstOrDefaultAsync(r => r.RegistrationId == registrationId);
+            .Include(registration => registration.Student)
+            .Include(registration => registration.Course)
+            .FirstOrDefaultAsync(registration => registration.RegistrationId == registrationId);
     }
 
     /// <summary>
@@ -90,27 +90,27 @@ public class RegistrationRepository : Repository<Registration>, IRegistrationRep
         RegistrationStatus? status = null)
     {
         var query = _dbSet
-            .Include(r => r.Student)
-            .Include(r => r.Course)
+            .Include(registration => registration.Student)
+            .Include(registration => registration.Course)
             .AsQueryable();
 
         if (studentId.HasValue)
         {
-            query = query.Where(r => r.StudentId == studentId.Value);
+            query = query.Where(registration => registration.StudentId == studentId.Value);
         }
 
         if (courseId.HasValue)
         {
-            query = query.Where(r => r.CourseId == courseId.Value);
+            query = query.Where(registration => registration.CourseId == courseId.Value);
         }
 
         if (status.HasValue)
         {
-            query = query.Where(r => r.Status == status.Value);
+            query = query.Where(registration => registration.Status == status.Value);
         }
 
         return await query
-            .OrderByDescending(r => r.RegistrationDate)
+            .OrderByDescending(registration => registration.RegistrationDate)
             .ToListAsync();
     }
 
@@ -124,9 +124,9 @@ public class RegistrationRepository : Repository<Registration>, IRegistrationRep
         if (pageSize > 100) pageSize = 100;
 
         return await _dbSet
-            .Include(r => r.Student)
-            .Include(r => r.Course)
-            .OrderByDescending(r => r.RegistrationDate)
+            .Include(registration => registration.Student)
+            .Include(registration => registration.Course)
+            .OrderByDescending(registration => registration.RegistrationDate)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -138,8 +138,8 @@ public class RegistrationRepository : Repository<Registration>, IRegistrationRep
     public override async Task<Registration?> GetByIdAsync(Guid id)
     {
         return await _dbSet
-            .Include(r => r.Student)
-            .Include(r => r.Course)
-            .FirstOrDefaultAsync(r => r.RegistrationId == id);
+            .Include(registration => registration.Student)
+            .Include(registration => registration.Course)
+            .FirstOrDefaultAsync(registration => registration.RegistrationId == id);
     }
 }
