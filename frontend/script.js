@@ -904,3 +904,273 @@ window.showCreateRegistration = showCreateRegistration;
 window.showRegistrationDetails = showRegistrationDetails;
 window.refreshRegistrations = refreshRegistrations;
 window.applyFilters = applyFilters;
+
+// ===== CERTIFICATES SECTION =====
+
+// Show certificates section
+function showCertificates() {
+    // Hide all sections
+    document.querySelectorAll('.section').forEach(section => {
+        section.classList.add('hidden');
+    });
+    
+    // Show certificates section
+    document.getElementById('certificates-section').classList.remove('hidden');
+    
+    // Update navigation
+    updateNavigation();
+    
+    // Set active nav link
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    event.target.closest('.nav-link').classList.add('active');
+    
+    // Clear search results initially
+    document.getElementById('certificates-container').innerHTML = '';
+    document.getElementById('certificates-empty').classList.add('hidden');
+    document.getElementById('certificate-search-input').value = '';
+}
+
+// Search certificates
+async function searchCertificates() {
+    const searchInput = document.getElementById('certificate-search-input');
+    const searchTerm = searchInput.value.trim();
+    
+    if (!searchTerm) {
+        showCertificateMessage('Please enter a student name or certificate ID to search');
+        return;
+    }
+    
+    const loadingElement = document.getElementById('certificates-loading');
+    const containerElement = document.getElementById('certificates-container');
+    const emptyElement = document.getElementById('certificates-empty');
+    
+    // Show loading
+    loadingElement.classList.remove('hidden');
+    containerElement.innerHTML = '';
+    emptyElement.classList.add('hidden');
+    
+    try {
+        // Check if search term is a GUID (certificate ID)
+        const guidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        let certificates = [];
+        
+        if (guidPattern.test(searchTerm)) {
+            // Search by certificate ID
+            const response = await fetch(`${API_BASE_URL}/certificates/${searchTerm}`);
+            if (response.ok) {
+                const certificate = await response.json();
+                certificates = [certificate];
+            }
+        } else {
+            // Search by student name
+            const response = await fetch(`${API_BASE_URL}/certificates/search?studentName=${encodeURIComponent(searchTerm)}`);
+            if (response.ok) {
+                certificates = await response.json();
+            }
+        }
+        
+        loadingElement.classList.add('hidden');
+        
+        if (certificates && certificates.length > 0) {
+            displayCertificates(certificates);
+        } else {
+            containerElement.innerHTML = '';
+            emptyElement.classList.remove('hidden');
+        }
+    } catch (error) {
+        console.error('Error searching certificates:', error);
+        loadingElement.classList.add('hidden');
+        showErrorModal('Failed to search certificates. Please try again.');
+    }
+}
+
+// Display certificates
+function displayCertificates(certificates) {
+    const container = document.getElementById('certificates-container');
+    
+    container.innerHTML = certificates.map(cert => `
+        <div class="certificate-card" onclick="showCertificateDetails('${cert.certificateId}')">
+            <div class="certificate-header">
+                <div class="certificate-icon">
+                    <i class="fas fa-certificate"></i>
+                </div>
+                <div class="certificate-number">
+                    ${escapeHtml(cert.certificateNumber)}
+                </div>
+            </div>
+            <div class="certificate-body">
+                <h3>${escapeHtml(cert.studentName)}</h3>
+                <p class="course-name"><i class="fas fa-book"></i> ${escapeHtml(cert.courseName)}</p>
+                <p class="instructor-name"><i class="fas fa-chalkboard-teacher"></i> ${escapeHtml(cert.instructorName)}</p>
+                <div class="certificate-meta">
+                    <span class="grade-badge grade-${getGradeClass(cert.finalGrade)}">
+                        Grade: ${getGradeText(cert.finalGrade)}
+                    </span>
+                    <span class="issue-date">
+                        <i class="fas fa-calendar"></i>
+                        ${formatDate(cert.issueDate)}
+                    </span>
+                </div>
+            </div>
+            <div class="certificate-footer">
+                <button class="btn-view-certificate">
+                    <i class="fas fa-eye"></i> View Details
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Show certificate details
+async function showCertificateDetails(certificateId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/certificates/${certificateId}`);
+        
+        if (response.ok) {
+            const certificate = await response.json();
+            const modal = document.getElementById('certificate-details-modal');
+            const content = document.getElementById('certificate-details-content');
+            
+            content.innerHTML = `
+                <div class="certificate-display">
+                    <div class="certificate-banner">
+                        <i class="fas fa-award"></i>
+                        <h2>Certificate of Completion</h2>
+                    </div>
+                    
+                    <div class="certificate-content">
+                        <div class="certificate-section">
+                            <h3>This certifies that</h3>
+                            <p class="student-name-large">${escapeHtml(certificate.studentName)}</p>
+                        </div>
+                        
+                        <div class="certificate-section">
+                            <h3>Has successfully completed</h3>
+                            <p class="course-name-large">${escapeHtml(certificate.courseName)}</p>
+                        </div>
+                        
+                        <div class="certificate-details-grid">
+                            <div class="detail-item">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                <div>
+                                    <strong>Instructor</strong>
+                                    <p>${escapeHtml(certificate.instructorName)}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <i class="fas fa-medal"></i>
+                                <div>
+                                    <strong>Final Grade</strong>
+                                    <p class="grade-display grade-${getGradeClass(certificate.finalGrade)}">
+                                        ${getGradeText(certificate.finalGrade)}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <div>
+                                    <strong>Course Duration</strong>
+                                    <p>${formatDate(certificate.courseStartDate)} - ${formatDate(certificate.courseEndDate)}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <i class="fas fa-calendar-check"></i>
+                                <div>
+                                    <strong>Issue Date</strong>
+                                    <p>${formatDate(certificate.issueDate)}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <i class="fas fa-hashtag"></i>
+                                <div>
+                                    <strong>Certificate Number</strong>
+                                    <p>${escapeHtml(certificate.certificateNumber)}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <i class="fas fa-shield-alt"></i>
+                                <div>
+                                    <strong>Digital Signature</strong>
+                                    <p class="signature-code">${escapeHtml(certificate.digitalSignature || 'N/A')}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${certificate.remarks ? `
+                            <div class="certificate-remarks">
+                                <i class="fas fa-comment-alt"></i>
+                                <strong>Remarks:</strong>
+                                <p>${escapeHtml(certificate.remarks)}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="certificate-footer-info">
+                        <p><i class="fas fa-info-circle"></i> This is an official digital certificate issued by the Course Registration System</p>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+        } else {
+            showErrorModal('Certificate not found');
+        }
+    } catch (error) {
+        console.error('Error loading certificate details:', error);
+        showErrorModal('Failed to load certificate details');
+    }
+}
+
+// Helper function to show certificate message
+function showCertificateMessage(message) {
+    const container = document.getElementById('certificates-container');
+    const emptyElement = document.getElementById('certificates-empty');
+    
+    container.innerHTML = '';
+    emptyElement.classList.add('hidden');
+    
+    container.innerHTML = `
+        <div class="info-message">
+            <i class="fas fa-info-circle"></i>
+            <p>${message}</p>
+        </div>
+    `;
+}
+
+// Helper function to get grade class
+function getGradeClass(grade) {
+    switch (grade) {
+        case 0: return 'a';  // Grade A
+        case 1: return 'b';  // Grade B
+        case 2: return 'c';  // Grade C
+        case 3: return 'd';  // Grade D
+        case 4: return 'f';  // Grade F
+        default: return 'unknown';
+    }
+}
+
+// Helper function to get grade text
+function getGradeText(grade) {
+    switch (grade) {
+        case 0: return 'A (Excellent)';
+        case 1: return 'B (Good)';
+        case 2: return 'C (Satisfactory)';
+        case 3: return 'D (Poor)';
+        case 4: return 'F (Fail)';
+        default: return 'Unknown';
+    }
+}
+
+// Export certificate functions
+window.showCertificates = showCertificates;
+window.searchCertificates = searchCertificates;
+window.showCertificateDetails = showCertificateDetails;
+
+window.applyFilters = applyFilters;
