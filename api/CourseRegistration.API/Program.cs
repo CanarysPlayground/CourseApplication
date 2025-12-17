@@ -66,6 +66,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+builder.Services.AddScoped<ICertificateService, CertificateService>();
 
 // Register authorization services
 builder.Services.AddScoped<AuthorizationService>();
@@ -299,6 +300,54 @@ static async Task SeedDatabase(CourseRegistrationDbContext context)
     context.Registrations.AddRange(registrations);
     await context.SaveChangesAsync();
     
-    Log.Information("Database seeded successfully with {StudentCount} students, {CourseCount} courses, and {RegistrationCount} registrations.", 
-        students.Length, courses.Length, registrations.Length);
+    // Sample certificates for completed courses
+    var certificates = new[]
+    {
+        new CourseRegistration.Domain.Entities.Certificate
+        {
+            StudentId = students[0].StudentId,
+            CourseId = courses[0].CourseId,
+            IssueDate = DateTime.UtcNow.AddDays(-30),
+            FinalGrade = CourseRegistration.Domain.Enums.Grade.A,
+            CertificateNumber = "CERT-2024-001",
+            Remarks = "Outstanding performance throughout the course",
+            DigitalSignature = "DS-" + Guid.NewGuid().ToString()[..8]
+        },
+        new CourseRegistration.Domain.Entities.Certificate
+        {
+            StudentId = students[1].StudentId,
+            CourseId = courses[2].CourseId,
+            IssueDate = DateTime.UtcNow.AddDays(-20),
+            FinalGrade = CourseRegistration.Domain.Enums.Grade.B,
+            CertificateNumber = "CERT-2024-002",
+            Remarks = "Strong practical skills demonstrated",
+            DigitalSignature = "DS-" + Guid.NewGuid().ToString()[..8]
+        },
+        new CourseRegistration.Domain.Entities.Certificate
+        {
+            StudentId = students[2].StudentId,
+            CourseId = courses[4].CourseId,
+            IssueDate = DateTime.UtcNow.AddDays(-10),
+            FinalGrade = CourseRegistration.Domain.Enums.Grade.A,
+            CertificateNumber = "CERT-2024-003",
+            Remarks = "Exceptional database design project",
+            DigitalSignature = "DS-" + Guid.NewGuid().ToString()[..8]
+        },
+        new CourseRegistration.Domain.Entities.Certificate
+        {
+            StudentId = students[3].StudentId,
+            CourseId = courses[1].CourseId,
+            IssueDate = DateTime.UtcNow.AddDays(-5),
+            FinalGrade = CourseRegistration.Domain.Enums.Grade.B,
+            CertificateNumber = "CERT-2024-004",
+            Remarks = "Good analytical and problem-solving skills",
+            DigitalSignature = "DS-" + Guid.NewGuid().ToString()[..8]
+        }
+    };
+    
+    context.Certificates.AddRange(certificates);
+    await context.SaveChangesAsync();
+    
+    Log.Information("Database seeded successfully with {StudentCount} students, {CourseCount} courses, {RegistrationCount} registrations, and {CertificateCount} certificates.", 
+        students.Length, courses.Length, registrations.Length, certificates.Length);
 }
