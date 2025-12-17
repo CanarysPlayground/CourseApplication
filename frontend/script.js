@@ -908,7 +908,7 @@ window.applyFilters = applyFilters;
 // ===== CERTIFICATES SECTION =====
 
 // Show certificates section
-function showCertificates() {
+function showCertificates(event) {
     // Hide all sections
     document.querySelectorAll('.section').forEach(section => {
         section.classList.add('hidden');
@@ -920,11 +920,13 @@ function showCertificates() {
     // Update navigation
     updateNavigation();
     
-    // Set active nav link
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.classList.remove('active');
-    });
-    event.target.closest('.nav-link').classList.add('active');
+    // Set active nav link if event is provided
+    if (event) {
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        event.target.closest('.nav-link').classList.add('active');
+    }
     
     // Clear search results initially
     document.getElementById('certificates-container').innerHTML = '';
@@ -1172,5 +1174,3 @@ function getGradeText(grade) {
 window.showCertificates = showCertificates;
 window.searchCertificates = searchCertificates;
 window.showCertificateDetails = showCertificateDetails;
-
-window.applyFilters = applyFilters;
