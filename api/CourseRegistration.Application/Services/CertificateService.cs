@@ -10,6 +10,9 @@ namespace CourseRegistration.Application.Services;
 /// </summary>
 public class CertificateService : ICertificateService
 {
+    // Thread-safe lock for certificate number generation
+    private static readonly object _lock = new object();
+    
     // In a real application, this would use a repository pattern with Entity Framework
     // For demo purposes, I'll use in-memory data
     private static readonly List<Certificate> _certificates = new();
@@ -154,15 +157,22 @@ public class CertificateService : ICertificateService
             DigitalSignature = "DS-" + Guid.NewGuid().ToString()[..8]
         };
 
-        _certificates.Add(certificate);
+        lock (_lock)
+        {
+            _certificates.Add(certificate);
+        }
+        
         return MapToDto(certificate);
     }
 
     public string GenerateCertificateNumber()
     {
-        var year = DateTime.Now.Year;
-        var sequence = _certificates.Count + 1;
-        return $"CERT-{year}-{sequence:D3}";
+        lock (_lock)
+        {
+            var year = DateTime.Now.Year;
+            var sequence = _certificates.Count + 1;
+            return $"CERT-{year}-{sequence:D3}";
+        }
     }
 
     private CertificateDto MapToDto(Certificate certificate)

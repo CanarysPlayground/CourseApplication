@@ -114,7 +114,7 @@ function createCertificateCard(certificate) {
         day: 'numeric'
     });
     
-    const gradeClass = `grade-${certificate.finalGrade}`;
+    const gradeClass = `grade-${getGradeText(certificate.finalGrade)}`;
     const gradeDisplay = getGradeDisplay(certificate.finalGrade);
     
     card.innerHTML = `
@@ -253,6 +253,19 @@ function getGradeDisplay(grade) {
     };
     
     return gradeMap[grade] || grade.toString();
+}
+
+// Get grade letter for CSS class
+function getGradeText(grade) {
+    const gradeMap = {
+        0: 'A',
+        1: 'B',
+        2: 'C',
+        3: 'D',
+        4: 'F'
+    };
+    
+    return gradeMap[grade] || 'F';
 }
 
 // Close certificate viewer
