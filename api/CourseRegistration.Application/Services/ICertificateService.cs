@@ -29,6 +29,20 @@ public interface ICertificateService
     Task<IEnumerable<CertificateDto>> GetCertificatesByStudentNameAsync(string studentName);
 
     /// <summary>
+    /// Get certificates by course ID
+    /// </summary>
+    /// <param name="courseId">Course ID</param>
+    /// <returns>List of certificates</returns>
+    Task<IEnumerable<CertificateDto>> GetCertificatesByCourseIdAsync(Guid courseId);
+
+    /// <summary>
+    /// Get certificate by certificate number
+    /// </summary>
+    /// <param name="certificateNumber">Certificate number</param>
+    /// <returns>Certificate details</returns>
+    Task<CertificateDto?> GetCertificateByCertificateNumberAsync(string certificateNumber);
+
+    /// <summary>
     /// Create a new certificate
     /// </summary>
     /// <param name="createCertificateDto">Certificate creation data</param>

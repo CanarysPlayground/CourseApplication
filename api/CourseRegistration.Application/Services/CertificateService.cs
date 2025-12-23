@@ -121,6 +121,23 @@ public class CertificateService : ICertificateService
         return certificates.Select(MapToDto);
     }
 
+    public async Task<IEnumerable<CertificateDto>> GetCertificatesByCourseIdAsync(Guid courseId)
+    {
+        await Task.CompletedTask; // Simulate async operation
+        
+        var certificates = _certificates.Where(c => c.CourseId == courseId);
+        return certificates.Select(MapToDto);
+    }
+
+    public async Task<CertificateDto?> GetCertificateByCertificateNumberAsync(string certificateNumber)
+    {
+        await Task.CompletedTask; // Simulate async operation
+        
+        var certificate = _certificates.FirstOrDefault(c => 
+            c.CertificateNumber.Equals(certificateNumber, StringComparison.OrdinalIgnoreCase));
+        return certificate != null ? MapToDto(certificate) : null;
+    }
+
     public async Task<CertificateDto> CreateCertificateAsync(CreateCertificateDto createCertificateDto)
     {
         await Task.CompletedTask; // Simulate async operation
@@ -153,6 +170,10 @@ public class CertificateService : ICertificateService
         var student = _students.FirstOrDefault(s => s.StudentId == certificate.StudentId);
         var course = _courses.FirstOrDefault(c => c.CourseId == certificate.CourseId);
 
+        // Generate verification URL and QR code data
+        var verificationUrl = $"https://courseregistration.app/api/certificates/verify/{certificate.CertificateNumber}";
+        var qrCodeData = $"{verificationUrl}|{certificate.CertificateId}|{certificate.DigitalSignature}";
+
         return new CertificateDto
         {
             CertificateId = certificate.CertificateId,
@@ -167,7 +188,9 @@ public class CertificateService : ICertificateService
             CourseStartDate = course?.StartDate ?? DateTime.MinValue,
             CourseEndDate = course?.EndDate ?? DateTime.MinValue,
             Remarks = certificate.Remarks,
-            DigitalSignature = certificate.DigitalSignature
+            DigitalSignature = certificate.DigitalSignature,
+            VerificationUrl = verificationUrl,
+            QRCodeData = qrCodeData
         };
     }
 }
