@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Search - Course Registration System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="certificate-styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h1>Course Registration System</h1>
+                </div>
+                <nav class="nav-menu">
+                    <a href="index.html" class="nav-link">
+                        <i class="fas fa-plus-circle"></i>
+                        Add Course
+                    </a>
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-list"></i>
+                        View Courses
+                    </a>
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        Students
+                    </a>
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-user-check"></i>
+                        Registrations
+                    </a>
+                    <a href="certificates.html" class="nav-link active">
+                        <i class="fas fa-certificate"></i>
+                        Certificates
+                    </a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Certificate Search Section -->
+            <section id="certificate-search-section" class="section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-certificate"></i>
+                        Certificate Search & Verification
+                    </h2>
+                    <p>Search for digital certificates by student name, course, or certificate number</p>
+                </div>
+
+                <!-- Search Form -->
+                <div class="form-container">
+                    <form id="certificate-search-form" class="form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="searchStudentName" class="form-label">
+                                    <i class="fas fa-user"></i>
+                                    Student Name
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="searchStudentName" 
+                                    name="searchStudentName" 
+                                    class="form-input" 
+                                    placeholder="Enter student name..."
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="searchCertificateNumber" class="form-label">
+                                    <i class="fas fa-hashtag"></i>
+                                    Certificate Number
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="searchCertificateNumber" 
+                                    name="searchCertificateNumber" 
+                                    class="form-input" 
+                                    placeholder="e.g., CERT-2024-001"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="resetSearchForm()">
+                                <i class="fas fa-undo"></i>
+                                Reset
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                                Search Certificates
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Search Results -->
+                <div id="search-results-container" class="search-results-section hidden">
+                    <div class="section-header">
+                        <h3>
+                            <i class="fas fa-list"></i>
+                            Search Results
+                        </h3>
+                        <p id="results-count">Found 0 certificates</p>
+                    </div>
+                    <div id="certificates-grid" class="certificates-grid">
+                        <!-- Results will be loaded here dynamically -->
+                    </div>
+                </div>
+
+                <div id="search-loading" class="loading hidden">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    Searching for certificates...
+                </div>
+
+                <div id="search-empty" class="empty-state hidden">
+                    <i class="fas fa-search"></i>
+                    <h3>No certificates found</h3>
+                    <p>Try adjusting your search criteria</p>
+                </div>
+            </section>
+
+            <!-- Certificate Viewer Modal -->
+            <div id="certificate-viewer-modal" class="modal hidden">
+                <div class="modal-content certificate-modal">
+                    <div class="modal-header">
+                        <h3>Certificate Details</h3>
+                        <button class="modal-close" onclick="closeCertificateViewer()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="certificate-display" class="certificate-display">
+                            <!-- Certificate content will be loaded here -->
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="printCertificate()">
+                            <i class="fas fa-print"></i>
+                            Print Certificate
+                        </button>
+                        <button class="btn btn-primary" onclick="downloadCertificate()">
+                            <i class="fas fa-download"></i>
+                            Download PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Success Modal -->
+        <div id="success-modal" class="modal hidden">
+            <div class="modal-content success">
+                <div class="modal-header">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Success!</h3>
+                </div>
+                <div class="modal-body">
+                    <p id="success-message">Operation completed successfully!</p>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="closeModal('success-modal')">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Modal -->
+        <div id="error-modal" class="modal hidden">
+            <div class="modal-content error">
+                <div class="modal-header">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Error</h3>
+                </div>
+                <div class="modal-body">
+                    <p id="error-message">An error occurred.</p>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="closeModal('error-modal')">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Processing...</p>
+        </div>
+    </div>
+
+    <script src="certificates.js"></script>
+</body>
+</html>

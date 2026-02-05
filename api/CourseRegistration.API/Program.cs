@@ -66,6 +66,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+builder.Services.AddScoped<ICertificateService, CertificateService>();
 
 // Register authorization services
 builder.Services.AddScoped<AuthorizationService>();

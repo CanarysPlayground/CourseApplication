@@ -20,6 +20,8 @@ public class CertificateDto
     public DateTime CourseEndDate { get; set; }
     public string? Remarks { get; set; }
     public string? DigitalSignature { get; set; }
+    public string? VerificationUrl { get; set; }
+    public string? QRCodeData { get; set; }
 }
 
 /// <summary>
