@@ -14,14 +14,16 @@ public class RegistrationService : IRegistrationService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly IWaitlistService _waitlistService;
 
     /// <summary>
     /// Initializes a new instance of the RegistrationService
     /// </summary>
-    public RegistrationService(IUnitOfWork unitOfWork, IMapper mapper)
+    public RegistrationService(IUnitOfWork unitOfWork, IMapper mapper, IWaitlistService waitlistService)
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _waitlistService = waitlistService ?? throw new ArgumentNullException(nameof(waitlistService));
     }
 
     /// <summary>
@@ -113,6 +115,14 @@ public class RegistrationService : IRegistrationService
             throw new InvalidOperationException("Student is already registered for this course.");
         }
 
+        // Check if course is full
+        if (course.IsFull)
+        {
+            throw new InvalidOperationException(
+                $"Course is full (max enrollment: {course.MaxEnrollment}). " +
+                "Please join the waitlist instead.");
+        }
+
         var registration = _mapper.Map<Registration>(createRegistrationDto);
         registration.Status = RegistrationStatus.Pending;
         registration.RegistrationDate = DateTime.UtcNow;
@@ -171,9 +181,19 @@ public class RegistrationService : IRegistrationService
             throw new InvalidOperationException("Cannot cancel a completed registration.");
         }
 
+        var courseId = registration.CourseId;
+        var wasConfirmed = registration.Status == RegistrationStatus.Confirmed;
+
         registration.Status = RegistrationStatus.Cancelled;
         _unitOfWork.Registrations.Update(registration);
         await _unitOfWork.SaveChangesAsync();
+
+        // If a confirmed registration was cancelled, notify the next person on the waitlist
+        if (wasConfirmed)
+        {
+            await _waitlistService.NotifyNextStudentAsync(courseId);
+        }
+
         return true;
     }
 

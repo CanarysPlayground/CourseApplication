@@ -54,6 +54,12 @@ public class Course
     public string Schedule { get; set; } = string.Empty;
 
     /// <summary>
+    /// Maximum number of students allowed to enroll in the course
+    /// </summary>
+    [Required]
+    public int MaxEnrollment { get; set; } = 30;
+
+    /// <summary>
     /// Indicates if the course is active
     /// </summary>
     public bool IsActive { get; set; } = true;
@@ -74,8 +80,19 @@ public class Course
     public virtual ICollection<Registration> Registrations { get; set; } = new List<Registration>();
 
     /// <summary>
+    /// Navigation property for course waitlist entries
+    /// </summary>
+    public virtual ICollection<WaitlistEntry> WaitlistEntries { get; set; } = new List<WaitlistEntry>();
+
+    /// <summary>
     /// Computed property for current enrollment count
     /// </summary>
     [NotMapped]
     public int CurrentEnrollment => Registrations?.Count(r => r.Status == Enums.RegistrationStatus.Confirmed) ?? 0;
+
+    /// <summary>
+    /// Computed property to check if course is full
+    /// </summary>
+    [NotMapped]
+    public bool IsFull => CurrentEnrollment >= MaxEnrollment;
 }
