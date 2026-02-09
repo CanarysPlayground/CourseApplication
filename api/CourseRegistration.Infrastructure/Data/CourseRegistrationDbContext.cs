@@ -33,6 +33,11 @@ public class CourseRegistrationDbContext : DbContext
     public DbSet<Registration> Registrations { get; set; } = null!;
 
     /// <summary>
+    /// Certificates DbSet
+    /// </summary>
+    public DbSet<Certificate> Certificates { get; set; } = null!;
+
+    /// <summary>
     /// Configures the model relationships and constraints
     /// </summary>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -106,6 +111,34 @@ public class CourseRegistrationDbContext : DbContext
             entity.HasOne(r => r.Course)
                   .WithMany(c => c.Registrations)
                   .HasForeignKey(r => r.CourseId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure Certificate entity
+        modelBuilder.Entity<Certificate>(entity =>
+        {
+            entity.HasKey(c => c.CertificateId);
+            entity.Property(c => c.StudentId).IsRequired();
+            entity.Property(c => c.CourseId).IsRequired();
+            entity.Property(c => c.IssueDate).IsRequired();
+            entity.Property(c => c.FinalGrade).IsRequired()
+                  .HasConversion<string>();
+            entity.Property(c => c.CertificateNumber).IsRequired().HasMaxLength(20);
+            entity.Property(c => c.Remarks).HasMaxLength(200);
+            entity.Property(c => c.DigitalSignature).HasMaxLength(100);
+
+            // Create unique constraint for certificate number
+            entity.HasIndex(c => c.CertificateNumber).IsUnique();
+
+            // Configure relationships
+            entity.HasOne(c => c.Student)
+                  .WithMany()
+                  .HasForeignKey(c => c.StudentId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(c => c.Course)
+                  .WithMany()
+                  .HasForeignKey(c => c.CourseId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
     }
