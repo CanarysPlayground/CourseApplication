@@ -1,6 +1,28 @@
 // Configuration
 const API_BASE_URL = 'http://localhost:5210/api';
 
+// Theme Management
+function initializeTheme() {
+    // Get saved theme from localStorage or default to 'light'
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    applyTheme(savedTheme);
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    applyTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+}
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    // The CSS handles the icon visibility through the data-theme attribute
+}
+
+// Export theme functions
+window.toggleTheme = toggleTheme;
+
 // DOM Elements
 const addCourseForm = document.getElementById('add-course-form');
 const submitBtn = document.getElementById('submit-btn');
@@ -9,6 +31,7 @@ const loadingOverlay = document.getElementById('loading-overlay');
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
+    initializeTheme();
     initializeForm();
     loadCourses();
     updateNavigation();
