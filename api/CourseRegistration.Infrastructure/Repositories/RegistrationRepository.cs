@@ -115,6 +115,75 @@ public class RegistrationRepository : Repository<Registration>, IRegistrationRep
     }
 
     /// <summary>
+    /// Gets paginated registrations with filtering options asynchronously
+    /// </summary>
+    public async Task<IEnumerable<Registration>> GetPagedRegistrationsWithFiltersAsync(
+        int page,
+        int pageSize,
+        Guid? studentId = null,
+        Guid? courseId = null,
+        RegistrationStatus? status = null)
+    {
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 10;
+        if (pageSize > 100) pageSize = 100;
+
+        var query = _dbSet
+            .Include(r => r.Student)
+            .Include(r => r.Course)
+            .AsQueryable();
+
+        if (studentId.HasValue)
+        {
+            query = query.Where(r => r.StudentId == studentId.Value);
+        }
+
+        if (courseId.HasValue)
+        {
+            query = query.Where(r => r.CourseId == courseId.Value);
+        }
+
+        if (status.HasValue)
+        {
+            query = query.Where(r => r.Status == status.Value);
+        }
+
+        return await query
+            .OrderByDescending(r => r.RegistrationDate)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// Gets count of registrations matching filters asynchronously
+    /// </summary>
+    public async Task<int> CountRegistrationsWithFiltersAsync(
+        Guid? studentId = null,
+        Guid? courseId = null,
+        RegistrationStatus? status = null)
+    {
+        var query = _dbSet.AsQueryable();
+
+        if (studentId.HasValue)
+        {
+            query = query.Where(r => r.StudentId == studentId.Value);
+        }
+
+        if (courseId.HasValue)
+        {
+            query = query.Where(r => r.CourseId == courseId.Value);
+        }
+
+        if (status.HasValue)
+        {
+            query = query.Where(r => r.Status == status.Value);
+        }
+
+        return await query.CountAsync();
+    }
+
+    /// <summary>
     /// Override GetPagedAsync to include related entities
     /// </summary>
     public override async Task<IEnumerable<Registration>> GetPagedAsync(int page, int pageSize)

@@ -25,7 +25,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     {
         return await _dbSet
             .Where(s => s.IsActive)
-            .FirstOrDefaultAsync(s => s.Email.ToLower() == email.ToLower());
+            .FirstOrDefaultAsync(s => EF.Functions.Like(s.Email, email));
     }
 
     /// <summary>
@@ -48,12 +48,12 @@ public class StudentRepository : Repository<Student>, IStudentRepository
         if (string.IsNullOrWhiteSpace(searchTerm))
             return await GetActiveStudentsAsync();
 
-        var lowerSearchTerm = searchTerm.ToLower();
+        var searchPattern = $"%{searchTerm}%";
         return await _dbSet
             .Where(s => s.IsActive && 
-                       (s.FirstName.ToLower().Contains(lowerSearchTerm) ||
-                        s.LastName.ToLower().Contains(lowerSearchTerm) ||
-                        s.Email.ToLower().Contains(lowerSearchTerm)))
+                       (EF.Functions.Like(s.FirstName, searchPattern) ||
+                        EF.Functions.Like(s.LastName, searchPattern) ||
+                        EF.Functions.Like(s.Email, searchPattern)))
             .OrderBy(s => s.LastName)
             .ThenBy(s => s.FirstName)
             .ToListAsync();

@@ -43,9 +43,11 @@ public class RegistrationService : IRegistrationService
 
         if (studentId.HasValue || courseId.HasValue || status.HasValue)
         {
-            registrations = await _unitOfWork.Registrations.GetRegistrationsWithFiltersAsync(studentId, courseId, status);
-            totalRegistrations = registrations.Count();
-            registrations = registrations.Skip((page - 1) * pageSize).Take(pageSize);
+            // Use optimized paginated query with filters to avoid loading all records into memory
+            registrations = await _unitOfWork.Registrations.GetPagedRegistrationsWithFiltersAsync(
+                page, pageSize, studentId, courseId, status);
+            totalRegistrations = await _unitOfWork.Registrations.CountRegistrationsWithFiltersAsync(
+                studentId, courseId, status);
         }
         else
         {

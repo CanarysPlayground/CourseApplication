@@ -39,16 +39,16 @@ public class CourseRepository : Repository<Course>, ICourseRepository
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            var lowerSearchTerm = searchTerm.ToLower();
+            var searchPattern = $"%{searchTerm}%";
             query = query.Where(c => 
-                c.CourseName.ToLower().Contains(lowerSearchTerm) ||
-                (c.Description != null && c.Description.ToLower().Contains(lowerSearchTerm)));
+                EF.Functions.Like(c.CourseName, searchPattern) ||
+                (c.Description != null && EF.Functions.Like(c.Description, searchPattern)));
         }
 
         if (!string.IsNullOrWhiteSpace(instructor))
         {
-            var lowerInstructor = instructor.ToLower();
-            query = query.Where(c => c.InstructorName.ToLower().Contains(lowerInstructor));
+            var instructorPattern = $"%{instructor}%";
+            query = query.Where(c => EF.Functions.Like(c.InstructorName, instructorPattern));
         }
 
         return await query
@@ -90,9 +90,9 @@ public class CourseRepository : Repository<Course>, ICourseRepository
         if (string.IsNullOrWhiteSpace(instructorName))
             return Enumerable.Empty<Course>();
 
-        var lowerInstructorName = instructorName.ToLower();
+        var instructorPattern = $"%{instructorName}%";
         return await _dbSet
-            .Where(c => c.IsActive && c.InstructorName.ToLower().Contains(lowerInstructorName))
+            .Where(c => c.IsActive && EF.Functions.Like(c.InstructorName, instructorPattern))
             .OrderBy(c => c.CourseName)
             .ToListAsync();
     }
