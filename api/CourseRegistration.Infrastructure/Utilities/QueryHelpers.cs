@@ -11,10 +11,16 @@ public static class QueryHelpers
     /// </summary>
     /// <param name="pattern">The pattern to escape</param>
     /// <returns>The escaped pattern safe for use in SQL LIKE operations</returns>
+    /// <exception cref="ArgumentNullException">Thrown when pattern is null</exception>
     public static string EscapeLikePattern(string pattern)
     {
-        return pattern.Replace("^", "^^")
-                     .Replace("%", "^%")
-                     .Replace("_", "^_");
+        if (pattern == null)
+            throw new ArgumentNullException(nameof(pattern));
+
+        return pattern.Replace("^", "^^")   // Escape the escape character first
+                     .Replace("%", "^%")   // Escape wildcard for "any characters"
+                     .Replace("_", "^_")   // Escape wildcard for "single character"
+                     .Replace("[", "^[")   // Escape character set start (SQL Server)
+                     .Replace("]", "^]");  // Escape character set end (SQL Server)
     }
 }

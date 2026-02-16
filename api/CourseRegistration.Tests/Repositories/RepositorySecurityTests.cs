@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using CourseRegistration.Domain.Entities;
 using CourseRegistration.Infrastructure.Data;
 using CourseRegistration.Infrastructure.Repositories;
+using CourseRegistration.Infrastructure.Utilities;
 
 namespace CourseRegistration.Tests.Repositories;
 
@@ -211,5 +212,25 @@ public class RepositorySecurityTests
         var resultList = results.ToList();
         Assert.Single(resultList);
         Assert.Equal("John", resultList[0].FirstName);
+    }
+
+    [Fact]
+    public void QueryHelpers_EscapeLikePattern_WithNull_ThrowsArgumentNullException()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => QueryHelpers.EscapeLikePattern(null!));
+    }
+
+    [Fact]
+    public void QueryHelpers_EscapeLikePattern_EscapesAllSpecialCharacters()
+    {
+        // Arrange
+        var input = "test^%_[]string";
+
+        // Act
+        var result = QueryHelpers.EscapeLikePattern(input);
+
+        // Assert
+        Assert.Equal("test^^^%^_^[^]string", result);
     }
 }
