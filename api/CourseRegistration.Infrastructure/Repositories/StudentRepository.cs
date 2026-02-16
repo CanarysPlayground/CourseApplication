@@ -19,6 +19,17 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     }
 
     /// <summary>
+    /// Escapes SQL LIKE pattern special characters
+    /// Uses ^ as the escape character to avoid conflicts with % and _
+    /// </summary>
+    private static string EscapeLikePattern(string pattern)
+    {
+        return pattern.Replace("^", "^^")
+                      .Replace("%", "^%")
+                      .Replace("_", "^_");
+    }
+
+    /// <summary>
     /// Gets a student by email address asynchronously
     /// </summary>
     public async Task<Student?> GetByEmailAsync(string email)
@@ -48,12 +59,13 @@ public class StudentRepository : Repository<Student>, IStudentRepository
         if (string.IsNullOrWhiteSpace(searchTerm))
             return await GetActiveStudentsAsync();
 
-        var searchPattern = $"%{searchTerm}%";
+        var escapedTerm = EscapeLikePattern(searchTerm);
+        var searchPattern = $"%{escapedTerm}%";
         return await _dbSet
             .Where(s => s.IsActive && 
-                       (EF.Functions.Like(s.FirstName, searchPattern) ||
-                        EF.Functions.Like(s.LastName, searchPattern) ||
-                        EF.Functions.Like(s.Email, searchPattern)))
+                       (EF.Functions.Like(s.FirstName, searchPattern, "^") ||
+                        EF.Functions.Like(s.LastName, searchPattern, "^") ||
+                        EF.Functions.Like(s.Email, searchPattern, "^")))
             .OrderBy(s => s.LastName)
             .ThenBy(s => s.FirstName)
             .ToListAsync();

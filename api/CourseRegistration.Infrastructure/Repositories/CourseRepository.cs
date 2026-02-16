@@ -19,6 +19,17 @@ public class CourseRepository : Repository<Course>, ICourseRepository
     }
 
     /// <summary>
+    /// Escapes SQL LIKE pattern special characters
+    /// Uses ^ as the escape character to avoid conflicts with % and _
+    /// </summary>
+    private static string EscapeLikePattern(string pattern)
+    {
+        return pattern.Replace("^", "^^")
+                      .Replace("%", "^%")
+                      .Replace("_", "^_");
+    }
+
+    /// <summary>
     /// Gets a course with its registrations asynchronously
     /// </summary>
     public async Task<Course?> GetWithRegistrationsAsync(Guid courseId)
@@ -39,16 +50,18 @@ public class CourseRepository : Repository<Course>, ICourseRepository
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            var searchPattern = $"%{searchTerm}%";
+            var escapedTerm = EscapeLikePattern(searchTerm);
+            var searchPattern = $"%{escapedTerm}%";
             query = query.Where(c => 
-                EF.Functions.Like(c.CourseName, searchPattern) ||
-                (c.Description != null && EF.Functions.Like(c.Description, searchPattern)));
+                EF.Functions.Like(c.CourseName, searchPattern, "^") ||
+                (c.Description != null && EF.Functions.Like(c.Description, searchPattern, "^")));
         }
 
         if (!string.IsNullOrWhiteSpace(instructor))
         {
-            var instructorPattern = $"%{instructor}%";
-            query = query.Where(c => EF.Functions.Like(c.InstructorName, instructorPattern));
+            var escapedInstructor = EscapeLikePattern(instructor);
+            var instructorPattern = $"%{escapedInstructor}%";
+            query = query.Where(c => EF.Functions.Like(c.InstructorName, instructorPattern, "^"));
         }
 
         return await query
@@ -90,9 +103,10 @@ public class CourseRepository : Repository<Course>, ICourseRepository
         if (string.IsNullOrWhiteSpace(instructorName))
             return Enumerable.Empty<Course>();
 
-        var instructorPattern = $"%{instructorName}%";
+        var escapedInstructor = EscapeLikePattern(instructorName);
+        var instructorPattern = $"%{escapedInstructor}%";
         return await _dbSet
-            .Where(c => c.IsActive && EF.Functions.Like(c.InstructorName, instructorPattern))
+            .Where(c => c.IsActive && EF.Functions.Like(c.InstructorName, instructorPattern, "^"))
             .OrderBy(c => c.CourseName)
             .ToListAsync();
     }
