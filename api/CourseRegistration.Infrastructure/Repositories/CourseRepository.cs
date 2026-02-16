@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using CourseRegistration.Domain.Entities;
 using CourseRegistration.Domain.Interfaces;
 using CourseRegistration.Infrastructure.Data;
+using CourseRegistration.Infrastructure.Utilities;
 
 namespace CourseRegistration.Infrastructure.Repositories;
 
@@ -39,16 +40,18 @@ public class CourseRepository : Repository<Course>, ICourseRepository
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            var lowerSearchTerm = searchTerm.ToLower();
+            var escapedTerm = QueryHelpers.EscapeLikePattern(searchTerm);
+            var searchPattern = $"%{escapedTerm}%";
             query = query.Where(c => 
-                c.CourseName.ToLower().Contains(lowerSearchTerm) ||
-                (c.Description != null && c.Description.ToLower().Contains(lowerSearchTerm)));
+                EF.Functions.Like(c.CourseName, searchPattern, "^") ||
+                (c.Description != null && EF.Functions.Like(c.Description, searchPattern, "^")));
         }
 
         if (!string.IsNullOrWhiteSpace(instructor))
         {
-            var lowerInstructor = instructor.ToLower();
-            query = query.Where(c => c.InstructorName.ToLower().Contains(lowerInstructor));
+            var escapedInstructor = QueryHelpers.EscapeLikePattern(instructor);
+            var instructorPattern = $"%{escapedInstructor}%";
+            query = query.Where(c => EF.Functions.Like(c.InstructorName, instructorPattern, "^"));
         }
 
         return await query
@@ -90,9 +93,10 @@ public class CourseRepository : Repository<Course>, ICourseRepository
         if (string.IsNullOrWhiteSpace(instructorName))
             return Enumerable.Empty<Course>();
 
-        var lowerInstructorName = instructorName.ToLower();
+        var escapedInstructor = QueryHelpers.EscapeLikePattern(instructorName);
+        var instructorPattern = $"%{escapedInstructor}%";
         return await _dbSet
-            .Where(c => c.IsActive && c.InstructorName.ToLower().Contains(lowerInstructorName))
+            .Where(c => c.IsActive && EF.Functions.Like(c.InstructorName, instructorPattern, "^"))
             .OrderBy(c => c.CourseName)
             .ToListAsync();
     }

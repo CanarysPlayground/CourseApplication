@@ -40,4 +40,22 @@ public interface IRegistrationRepository : IRepository<Registration>
         Guid? studentId = null, 
         Guid? courseId = null, 
         RegistrationStatus? status = null);
+
+    /// <summary>
+    /// Gets paginated registrations with filtering options asynchronously
+    /// </summary>
+    Task<IEnumerable<Registration>> GetPagedRegistrationsWithFiltersAsync(
+        int page,
+        int pageSize,
+        Guid? studentId = null,
+        Guid? courseId = null,
+        RegistrationStatus? status = null);
+
+    /// <summary>
+    /// Gets count of registrations matching filters asynchronously
+    /// </summary>
+    Task<int> CountRegistrationsWithFiltersAsync(
+        Guid? studentId = null,
+        Guid? courseId = null,
+        RegistrationStatus? status = null);
 }

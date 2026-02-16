@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using CourseRegistration.Domain.Entities;
 using CourseRegistration.Domain.Interfaces;
 using CourseRegistration.Infrastructure.Data;
+using CourseRegistration.Infrastructure.Utilities;
 
 namespace CourseRegistration.Infrastructure.Repositories;
 
@@ -19,13 +20,16 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     }
 
     /// <summary>
-    /// Gets a student by email address asynchronously
+    /// Gets a student by email address asynchronously with case-insensitive exact match
     /// </summary>
     public async Task<Student?> GetByEmailAsync(string email)
     {
+        // For case-insensitive exact matching, compare both in lowercase
+        // This works consistently across different database providers
+        var lowerEmail = email.ToLower();
         return await _dbSet
             .Where(s => s.IsActive)
-            .FirstOrDefaultAsync(s => s.Email.ToLower() == email.ToLower());
+            .FirstOrDefaultAsync(s => s.Email.ToLower() == lowerEmail);
     }
 
     /// <summary>
@@ -48,12 +52,13 @@ public class StudentRepository : Repository<Student>, IStudentRepository
         if (string.IsNullOrWhiteSpace(searchTerm))
             return await GetActiveStudentsAsync();
 
-        var lowerSearchTerm = searchTerm.ToLower();
+        var escapedTerm = QueryHelpers.EscapeLikePattern(searchTerm);
+        var searchPattern = $"%{escapedTerm}%";
         return await _dbSet
             .Where(s => s.IsActive && 
-                       (s.FirstName.ToLower().Contains(lowerSearchTerm) ||
-                        s.LastName.ToLower().Contains(lowerSearchTerm) ||
-                        s.Email.ToLower().Contains(lowerSearchTerm)))
+                       (EF.Functions.Like(s.FirstName, searchPattern, "^") ||
+                        EF.Functions.Like(s.LastName, searchPattern, "^") ||
+                        EF.Functions.Like(s.Email, searchPattern, "^")))
             .OrderBy(s => s.LastName)
             .ThenBy(s => s.FirstName)
             .ToListAsync();
