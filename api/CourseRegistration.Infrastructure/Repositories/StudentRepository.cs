@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using CourseRegistration.Domain.Entities;
 using CourseRegistration.Domain.Interfaces;
 using CourseRegistration.Infrastructure.Data;
+using CourseRegistration.Infrastructure.Utilities;
 
 namespace CourseRegistration.Infrastructure.Repositories;
 
@@ -19,24 +20,16 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     }
 
     /// <summary>
-    /// Escapes SQL LIKE pattern special characters
-    /// Uses ^ as the escape character to avoid conflicts with % and _
-    /// </summary>
-    private static string EscapeLikePattern(string pattern)
-    {
-        return pattern.Replace("^", "^^")
-                      .Replace("%", "^%")
-                      .Replace("_", "^_");
-    }
-
-    /// <summary>
-    /// Gets a student by email address asynchronously
+    /// Gets a student by email address asynchronously with case-insensitive exact match
     /// </summary>
     public async Task<Student?> GetByEmailAsync(string email)
     {
+        // For case-insensitive exact matching, compare both in lowercase
+        // This works consistently across different database providers
+        var lowerEmail = email.ToLower();
         return await _dbSet
             .Where(s => s.IsActive)
-            .FirstOrDefaultAsync(s => EF.Functions.Like(s.Email, email));
+            .FirstOrDefaultAsync(s => s.Email.ToLower() == lowerEmail);
     }
 
     /// <summary>
@@ -59,7 +52,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
         if (string.IsNullOrWhiteSpace(searchTerm))
             return await GetActiveStudentsAsync();
 
-        var escapedTerm = EscapeLikePattern(searchTerm);
+        var escapedTerm = QueryHelpers.EscapeLikePattern(searchTerm);
         var searchPattern = $"%{escapedTerm}%";
         return await _dbSet
             .Where(s => s.IsActive && 

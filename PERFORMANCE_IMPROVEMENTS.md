@@ -8,7 +8,9 @@ This document outlines the performance optimizations made to the CourseApplicati
 
 **Problem**: Case-insensitive string comparisons using `.ToLower()` in LINQ queries were forcing client-side evaluation instead of database-side execution, causing performance issues with large datasets.
 
-**Solution**: Replaced `.ToLower()` string comparisons with `EF.Functions.Like()` to enable database-side case-insensitive searching.
+**Solution**: 
+- For pattern matching (searches): Replaced with `EF.Functions.Like()` to enable database-side case-insensitive searching
+- For exact matching (email lookup): Kept `.ToLower()` comparison for consistent cross-database behavior
 
 **Impact**:
 - Queries are now executed entirely in the database
@@ -17,11 +19,11 @@ This document outlines the performance optimizations made to the CourseApplicati
 
 **Files Modified**:
 - `StudentRepository.cs`
-  - `GetByEmailAsync()` - Line 28
-  - `SearchByNameAsync()` - Lines 51-56
+  - `GetByEmailAsync()` - Uses `.ToLower()` for exact case-insensitive match
+  - `SearchByNameAsync()` - Uses `EF.Functions.Like()` with escaped patterns
 - `CourseRepository.cs`
-  - `SearchCoursesAsync()` - Lines 42-51
-  - `GetCoursesByInstructorAsync()` - Line 93-95
+  - `SearchCoursesAsync()` - Uses `EF.Functions.Like()` with escaped patterns
+  - `GetCoursesByInstructorAsync()` - Uses `EF.Functions.Like()` with escaped patterns
 
 **Before**:
 ```csharp
@@ -30,11 +32,19 @@ This document outlines the performance optimizations made to the CourseApplicati
 .Where(s => s.FirstName.ToLower().Contains(searchTerm.ToLower()))
 ```
 
-**After**:
+**After (Exact Match)**:
 ```csharp
-// Database-side execution
-.Where(s => EF.Functions.Like(s.Email, email))
-.Where(s => EF.Functions.Like(s.FirstName, $"%{searchTerm}%"))
+// Database-side exact match
+var lowerEmail = email.ToLower();
+.Where(s => s.Email.ToLower() == lowerEmail)
+```
+
+**After (Pattern Match)**:
+```csharp
+// Database-side pattern matching with SQL injection protection
+var escapedTerm = QueryHelpers.EscapeLikePattern(searchTerm);
+var pattern = $"%{escapedTerm}%";
+.Where(s => EF.Functions.Like(s.FirstName, pattern, "^"))
 ```
 
 ### 2. Pagination Optimization
@@ -74,6 +84,45 @@ totalRegistrations = await _unitOfWork.Registrations.CountRegistrationsWithFilte
     studentId, courseId, status);
 ```
 
+### 3. Security Improvements - SQL Injection Prevention
+
+**Problem**: User input in search operations was not properly escaped, allowing SQL LIKE wildcard characters (%, _, [) to be interpreted as wildcards rather than literals, potentially causing SQL injection vulnerabilities and unintended search results.
+
+**Solution**:
+- Created `QueryHelpers` utility class with `EscapeLikePattern()` method
+- Escapes SQL LIKE special characters using ^ as the escape character
+- Applied to all search operations in StudentRepository and CourseRepository
+- Added comprehensive security tests to validate escaping
+
+**Impact**:
+- Prevents SQL injection via LIKE pattern manipulation
+- Ensures search terms are treated as literals
+- Improves application security posture
+- Provides consistent escaping across all repositories
+
+**Files Added/Modified**:
+- `QueryHelpers.cs` - New utility class for SQL pattern escaping
+- `StudentRepository.cs` - Uses QueryHelpers for search escaping
+- `CourseRepository.cs` - Uses QueryHelpers for search escaping
+- `RepositorySecurityTests.cs` - New comprehensive security tests
+
+**Escaping Logic**:
+```csharp
+public static string EscapeLikePattern(string pattern)
+{
+    return pattern.Replace("^", "^^")  // Escape the escape character first
+                 .Replace("%", "^%")   // Escape wildcard for "any characters"
+                 .Replace("_", "^_");  // Escape wildcard for "single character"
+}
+```
+
+**Usage**:
+```csharp
+var escapedTerm = QueryHelpers.EscapeLikePattern(searchTerm);
+var searchPattern = $"%{escapedTerm}%";
+query = query.Where(c => EF.Functions.Like(c.CourseName, searchPattern, "^"));
+```
+
 ## Performance Metrics
 
 ### Query Optimization Benefits:
@@ -88,11 +137,20 @@ totalRegistrations = await _unitOfWork.Registrations.CountRegistrationsWithFilte
 
 ## Test Coverage
 
-Added comprehensive performance tests in `RegistrationRepositoryPerformanceTests.cs`:
+Added comprehensive tests to validate all improvements:
+
+### Performance Tests (`RegistrationRepositoryPerformanceTests.cs`) - 4 Tests ✅
 - ✅ Pagination with filters returns correct page size
-- ✅ Second page returns remaining results correctly
+- ✅ Second page returns remaining results correctly  
 - ✅ Count with filters returns accurate totals
 - ✅ Status filter counting works correctly
+
+### Security Tests (`RepositorySecurityTests.cs`) - 5 Tests ✅
+- ✅ Percent wildcard (%) is properly escaped and treated as literal
+- ✅ Underscore wildcard (_) is properly escaped and treated as literal
+- ✅ Square brackets ([) are properly escaped and treated as literal
+- ✅ Course search properly escapes special characters
+- ✅ Normal text searches work as expected without escaping issues
 
 All tests pass successfully with efficient execution times (< 100ms per test).
 

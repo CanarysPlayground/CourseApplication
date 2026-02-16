@@ -24,7 +24,8 @@ public class AdminAccessCheckerTests
             Username = "admin",
             Email = "admin@test.com",
             FirstName = "Admin",
-            LastName = "User"
+            LastName = "User",
+            CreatedAt = DateTime.UtcNow.AddHours(-1) // Set to 1 hour ago to pass security check
         };
 
         // Act
@@ -46,7 +47,8 @@ public class AdminAccessCheckerTests
             Username = "superadmin",
             Email = "superadmin@test.com",
             FirstName = "Super",
-            LastName = "Admin"
+            LastName = "Admin",
+            CreatedAt = DateTime.UtcNow.AddHours(-1) // Set to 1 hour ago to pass security check
         };
 
         // Act
@@ -166,7 +168,8 @@ public class AdminAccessCheckerTests
             Username = "admin",
             Email = "admin@test.com",
             FirstName = "Admin",
-            LastName = "User"
+            LastName = "User",
+            CreatedAt = DateTime.UtcNow.AddHours(-1) // Set to 1 hour ago to pass security check
         };
 
         // Act

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using CourseRegistration.Domain.Entities;
 using CourseRegistration.Domain.Interfaces;
 using CourseRegistration.Infrastructure.Data;
+using CourseRegistration.Infrastructure.Utilities;
 
 namespace CourseRegistration.Infrastructure.Repositories;
 
@@ -16,17 +17,6 @@ public class CourseRepository : Repository<Course>, ICourseRepository
     /// <param name="context">Database context</param>
     public CourseRepository(CourseRegistrationDbContext context) : base(context)
     {
-    }
-
-    /// <summary>
-    /// Escapes SQL LIKE pattern special characters
-    /// Uses ^ as the escape character to avoid conflicts with % and _
-    /// </summary>
-    private static string EscapeLikePattern(string pattern)
-    {
-        return pattern.Replace("^", "^^")
-                      .Replace("%", "^%")
-                      .Replace("_", "^_");
     }
 
     /// <summary>
@@ -50,7 +40,7 @@ public class CourseRepository : Repository<Course>, ICourseRepository
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            var escapedTerm = EscapeLikePattern(searchTerm);
+            var escapedTerm = QueryHelpers.EscapeLikePattern(searchTerm);
             var searchPattern = $"%{escapedTerm}%";
             query = query.Where(c => 
                 EF.Functions.Like(c.CourseName, searchPattern, "^") ||
@@ -59,7 +49,7 @@ public class CourseRepository : Repository<Course>, ICourseRepository
 
         if (!string.IsNullOrWhiteSpace(instructor))
         {
-            var escapedInstructor = EscapeLikePattern(instructor);
+            var escapedInstructor = QueryHelpers.EscapeLikePattern(instructor);
             var instructorPattern = $"%{escapedInstructor}%";
             query = query.Where(c => EF.Functions.Like(c.InstructorName, instructorPattern, "^"));
         }
@@ -103,7 +93,7 @@ public class CourseRepository : Repository<Course>, ICourseRepository
         if (string.IsNullOrWhiteSpace(instructorName))
             return Enumerable.Empty<Course>();
 
-        var escapedInstructor = EscapeLikePattern(instructorName);
+        var escapedInstructor = QueryHelpers.EscapeLikePattern(instructorName);
         var instructorPattern = $"%{escapedInstructor}%";
         return await _dbSet
             .Where(c => c.IsActive && EF.Functions.Like(c.InstructorName, instructorPattern, "^"))
