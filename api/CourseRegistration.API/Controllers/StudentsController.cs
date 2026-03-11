@@ -125,7 +125,7 @@ public class StudentsController : ControllerBase
             return NotFound(ApiResponseDto<object>.ErrorResponse("Student not found"));
         }
 
-        return Ok(ApiResponseDto<object>.SuccessResponse(null, "Student deleted successfully"));
+        return Ok(ApiResponseDto<object?>.SuccessResponse(null, "Student deleted successfully"));
     }
 
     /// <summary>

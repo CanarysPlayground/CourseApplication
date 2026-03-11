@@ -33,6 +33,10 @@ public class AuthorizationService
     public async Task<bool> HasAdminAccessAsync(Guid userId, IUserRepository userRepository)
     {
         var user = await userRepository.GetByIdAsync(userId);
+
+        if (user == null)
+            return false;
+
         return HasAdminAccess(user);
     }
 
@@ -61,6 +65,10 @@ public class AuthorizationService
     public async Task<bool> HasInstructorAccessAsync(Guid userId, IUserRepository userRepository)
     {
         var user = await userRepository.GetByIdAsync(userId);
+
+        if (user == null)
+            return false;
+
         return HasInstructorAccess(user);
     }
 

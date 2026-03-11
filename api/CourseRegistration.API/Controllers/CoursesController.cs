@@ -131,7 +131,7 @@ public class CoursesController : ControllerBase
             return NotFound(ApiResponseDto<object>.ErrorResponse("Course not found"));
         }
 
-        return Ok(ApiResponseDto<object>.SuccessResponse(null, "Course deleted successfully"));
+        return Ok(ApiResponseDto<object?>.SuccessResponse(null, "Course deleted successfully"));
     }
 
     /// <summary>
