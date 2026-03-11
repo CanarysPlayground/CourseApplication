@@ -33,7 +33,7 @@ public class StudentService : IStudentService
         if (pageSize > 100) pageSize = 100;
 
         var students = await _unitOfWork.Students.GetPagedAsync(page, pageSize);
-        var totalStudents = await _unitOfWork.Students.CountAsync(s => ((Student)s).IsActive);
+        var totalStudents = await _unitOfWork.Students.CountAsync(student => ((Student)student).IsActive);
 
         var studentDtos = _mapper.Map<IEnumerable<StudentDto>>(students);
 

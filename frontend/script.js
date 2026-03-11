@@ -252,8 +252,8 @@ function clearAllErrors() {
     const errorElements = document.querySelectorAll('.error-message');
     const inputElements = document.querySelectorAll('.form-input, .form-textarea');
     
-    errorElements.forEach(el => el.textContent = '');
-    inputElements.forEach(el => el.classList.remove('error'));
+    errorElements.forEach(element => element.textContent = '');
+    inputElements.forEach(element => element.classList.remove('error'));
 }
 
 function displayValidationErrors(errors) {
@@ -519,9 +519,9 @@ function refreshCourses() {
 
 // Utility Functions
 function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+    const tempContainer = document.createElement('div');
+    tempContainer.textContent = text;
+    return tempContainer.innerHTML;
 }
 
 function formatDate(dateString) {
@@ -546,11 +546,11 @@ function formatDateTime(dateString) {
 
 function getCourseStatus(startDate, endDate) {
     const now = new Date();
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+    const startDateTime = new Date(startDate);
+    const endDateTime = new Date(endDate);
     
-    if (now < start) return 'upcoming';
-    if (now > end) return 'completed';
+    if (now < startDateTime) return 'upcoming';
+    if (now > endDateTime) return 'completed';
     return 'active';
 }
 
@@ -726,8 +726,8 @@ async function loadStudentsForDropdown() {
         
         if (response.ok && result.data && result.data.items) {
             allStudents = result.data.items;
-            const select = document.getElementById('registration-student');
-            select.innerHTML = '<option value="">Select a student...</option>' + 
+            const studentSelectElement = document.getElementById('registration-student');
+            studentSelectElement.innerHTML = '<option value="">Select a student...</option>' + 
                 allStudents.map(student => 
                     `<option value="${student.studentId}">${escapeHtml(student.fullName)} - ${escapeHtml(student.email)}</option>`
                 ).join('');
@@ -745,8 +745,8 @@ async function loadCoursesForDropdown() {
         
         if (response.ok && result.data && result.data.items) {
             allCourses = result.data.items;
-            const select = document.getElementById('registration-course');
-            select.innerHTML = '<option value="">Select a course...</option>' + 
+            const courseSelectElement = document.getElementById('registration-course');
+            courseSelectElement.innerHTML = '<option value="">Select a course...</option>' + 
                 allCourses.map(course => 
                     `<option value="${course.courseId}">${escapeHtml(course.courseName)} - ${escapeHtml(course.instructorName)}</option>`
                 ).join('');
@@ -863,8 +863,8 @@ function applyFilters() {
     let filteredRegistrations = allRegistrations;
     
     if (statusFilter !== '') {
-        filteredRegistrations = filteredRegistrations.filter(reg => 
-            reg.status.toString() === statusFilter
+        filteredRegistrations = filteredRegistrations.filter(registration => 
+            registration.status.toString() === statusFilter
         );
     }
     

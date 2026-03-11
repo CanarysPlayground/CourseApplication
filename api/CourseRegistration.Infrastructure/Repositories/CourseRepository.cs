@@ -24,10 +24,10 @@ public class CourseRepository : Repository<Course>, ICourseRepository
     public async Task<Course?> GetWithRegistrationsAsync(Guid courseId)
     {
         return await _dbSet
-            .Include(c => c.Registrations)
-                .ThenInclude(r => r.Student)
-            .Where(c => c.IsActive)
-            .FirstOrDefaultAsync(c => c.CourseId == courseId);
+            .Include(course => course.Registrations)
+                .ThenInclude(registration => registration.Student)
+            .Where(course => course.IsActive)
+            .FirstOrDefaultAsync(course => course.CourseId == courseId);
     }
 
     /// <summary>
@@ -35,24 +35,24 @@ public class CourseRepository : Repository<Course>, ICourseRepository
     /// </summary>
     public async Task<IEnumerable<Course>> SearchCoursesAsync(string? searchTerm, string? instructor)
     {
-        var query = _dbSet.Where(c => c.IsActive);
+        var query = _dbSet.Where(course => course.IsActive);
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             var lowerSearchTerm = searchTerm.ToLower();
-            query = query.Where(c => 
-                c.CourseName.ToLower().Contains(lowerSearchTerm) ||
-                (c.Description != null && c.Description.ToLower().Contains(lowerSearchTerm)));
+            query = query.Where(course => 
+                course.CourseName.ToLower().Contains(lowerSearchTerm) ||
+                (course.Description != null && course.Description.ToLower().Contains(lowerSearchTerm)));
         }
 
         if (!string.IsNullOrWhiteSpace(instructor))
         {
             var lowerInstructor = instructor.ToLower();
-            query = query.Where(c => c.InstructorName.ToLower().Contains(lowerInstructor));
+            query = query.Where(course => course.InstructorName.ToLower().Contains(lowerInstructor));
         }
 
         return await query
-            .OrderBy(c => c.CourseName)
+            .OrderBy(course => course.CourseName)
             .ToListAsync();
     }
 
@@ -62,8 +62,8 @@ public class CourseRepository : Repository<Course>, ICourseRepository
     public async Task<IEnumerable<Course>> GetActiveCoursesAsync()
     {
         return await _dbSet
-            .Where(c => c.IsActive)
-            .OrderBy(c => c.CourseName)
+            .Where(course => course.IsActive)
+            .OrderBy(course => course.CourseName)
             .ToListAsync();
     }
 
@@ -75,10 +75,10 @@ public class CourseRepository : Repository<Course>, ICourseRepository
         var currentDate = DateTime.UtcNow;
         
         return await _dbSet
-            .Include(c => c.Registrations)
-            .Where(c => c.IsActive && c.StartDate > currentDate)
-            .OrderBy(c => c.StartDate)
-            .ThenBy(c => c.CourseName)
+            .Include(course => course.Registrations)
+            .Where(course => course.IsActive && course.StartDate > currentDate)
+            .OrderBy(course => course.StartDate)
+            .ThenBy(course => course.CourseName)
             .ToListAsync();
     }
 
@@ -92,8 +92,8 @@ public class CourseRepository : Repository<Course>, ICourseRepository
 
         var lowerInstructorName = instructorName.ToLower();
         return await _dbSet
-            .Where(c => c.IsActive && c.InstructorName.ToLower().Contains(lowerInstructorName))
-            .OrderBy(c => c.CourseName)
+            .Where(course => course.IsActive && course.InstructorName.ToLower().Contains(lowerInstructorName))
+            .OrderBy(course => course.CourseName)
             .ToListAsync();
     }
 
@@ -107,8 +107,8 @@ public class CourseRepository : Repository<Course>, ICourseRepository
         if (pageSize > 100) pageSize = 100;
 
         return await _dbSet
-            .Where(c => c.IsActive)
-            .OrderBy(c => c.CourseName)
+            .Where(course => course.IsActive)
+            .OrderBy(course => course.CourseName)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -120,8 +120,8 @@ public class CourseRepository : Repository<Course>, ICourseRepository
     public override async Task<Course?> GetByIdAsync(Guid id)
     {
         return await _dbSet
-            .Where(c => c.IsActive)
-            .FirstOrDefaultAsync(c => c.CourseId == id);
+            .Where(course => course.IsActive)
+            .FirstOrDefaultAsync(course => course.CourseId == id);
     }
 
     /// <summary>
