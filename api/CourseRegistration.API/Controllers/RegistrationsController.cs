@@ -138,7 +138,7 @@ public class RegistrationsController : ControllerBase
             return NotFound(ApiResponseDto<object>.ErrorResponse("Registration not found"));
         }
 
-        return Ok(ApiResponseDto<object>.SuccessResponse(null, "Registration cancelled successfully"));
+        return Ok(ApiResponseDto<object?>.SuccessResponse(null, "Registration cancelled successfully"));
     }
 
     /// <summary>

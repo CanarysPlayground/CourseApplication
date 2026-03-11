@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using FluentValidation;
+using System.IO.Compression;
+using Microsoft.AspNetCore.ResponseCompression;
 using CourseRegistration.Infrastructure.Data;
 using CourseRegistration.Infrastructure.Repositories;
 using CourseRegistration.Domain.Interfaces;
@@ -84,6 +86,26 @@ builder.Services.AddCors(options =>
 // Add memory cache for performance
 builder.Services.AddMemoryCache();
 
+// Add response compression for better performance
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/json" });
+});
+
+builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.Fastest;
+});
+
+builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.Fastest;
+});
+
 // Add health checks
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<CourseRegistrationDbContext>();
@@ -91,6 +113,9 @@ builder.Services.AddHealthChecks()
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
+// Add response compression (should be one of the first middleware)
+app.UseResponseCompression();
 
 // Add global exception handling middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>();

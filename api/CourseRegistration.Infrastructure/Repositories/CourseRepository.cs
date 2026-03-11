@@ -39,21 +39,80 @@ public class CourseRepository : Repository<Course>, ICourseRepository
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            var lowerSearchTerm = searchTerm.ToLower();
-            query = query.Where(c => 
-                c.CourseName.ToLower().Contains(lowerSearchTerm) ||
-                (c.Description != null && c.Description.ToLower().Contains(lowerSearchTerm)));
+            // Use EF.Functions.Like for better performance - allows database to use indexes
+            var escapedSearchTerm = EscapeLikePattern(searchTerm);
+            query = query.Where(c =>
+                EF.Functions.Like(c.CourseName, $"%{escapedSearchTerm}%") ||
+                (c.Description != null && EF.Functions.Like(c.Description, $"%{escapedSearchTerm}%")));
         }
 
         if (!string.IsNullOrWhiteSpace(instructor))
         {
-            var lowerInstructor = instructor.ToLower();
-            query = query.Where(c => c.InstructorName.ToLower().Contains(lowerInstructor));
+            var escapedInstructor = EscapeLikePattern(instructor);
+            query = query.Where(c => EF.Functions.Like(c.InstructorName, $"%{escapedInstructor}%"));
         }
 
         return await query
             .OrderBy(c => c.CourseName)
             .ToListAsync();
+    }
+
+    /// <summary>
+    /// Searches courses with pagination at database level for optimal performance
+    /// </summary>
+    public async Task<(IEnumerable<Course> Courses, int TotalCount)> SearchCoursesPagedAsync(
+        string? searchTerm,
+        string? instructor,
+        int page,
+        int pageSize)
+    {
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 10;
+        if (pageSize > 100) pageSize = 100;
+
+        var query = _dbSet.Where(c => c.IsActive);
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            // Use EF.Functions.Like for database-level execution with index support
+            var escapedSearchTerm = EscapeLikePattern(searchTerm);
+            query = query.Where(c =>
+                EF.Functions.Like(c.CourseName, $"%{escapedSearchTerm}%") ||
+                (c.Description != null && EF.Functions.Like(c.Description, $"%{escapedSearchTerm}%")));
+        }
+
+        if (!string.IsNullOrWhiteSpace(instructor))
+        {
+            var escapedInstructor = EscapeLikePattern(instructor);
+            query = query.Where(c => EF.Functions.Like(c.InstructorName, $"%{escapedInstructor}%"));
+        }
+
+        // Get total count at database level before pagination
+        var totalCount = await query.CountAsync();
+
+        // Apply pagination at database level
+        var courses = await query
+            .OrderBy(c => c.CourseName)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (courses, totalCount);
+    }
+
+    /// <summary>
+    /// Escapes special LIKE pattern characters for safe SQL execution
+    /// </summary>
+    private static string EscapeLikePattern(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        return input
+            .Replace("^", "^^")  // Escape character itself
+            .Replace("%", "^%")  // Wildcard for any characters
+            .Replace("_", "^_")  // Wildcard for single character
+            .Replace("[", "^["); // Character set delimiter
     }
 
     /// <summary>
@@ -90,9 +149,9 @@ public class CourseRepository : Repository<Course>, ICourseRepository
         if (string.IsNullOrWhiteSpace(instructorName))
             return Enumerable.Empty<Course>();
 
-        var lowerInstructorName = instructorName.ToLower();
+        var escapedInstructorName = EscapeLikePattern(instructorName);
         return await _dbSet
-            .Where(c => c.IsActive && c.InstructorName.ToLower().Contains(lowerInstructorName))
+            .Where(c => c.IsActive && EF.Functions.Like(c.InstructorName, $"%{escapedInstructorName}%"))
             .OrderBy(c => c.CourseName)
             .ToListAsync();
     }
