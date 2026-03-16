@@ -1,0 +1,33 @@
+.certificate {
+    padding: 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.download-btn {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.6rem 1.4rem;
+    background-color: #4c51bf;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.download-btn:hover:not(:disabled) {
+    background-color: #434190;
+}
+
+.download-btn:disabled {
+    background-color: #a0aec0;
+    cursor: not-allowed;
+}
+
+.download-error {
+    margin-top: 0.75rem;
+    color: #c53030;
+    font-size: 0.9rem;
+}

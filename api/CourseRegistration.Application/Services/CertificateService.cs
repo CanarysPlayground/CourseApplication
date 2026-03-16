@@ -148,6 +148,122 @@ public class CertificateService : ICertificateService
         return $"CERT-{year}-{sequence:D3}";
     }
 
+    public async Task<byte[]?> DownloadCertificatePdfAsync(Guid certificateId)
+    {
+        await Task.CompletedTask; // Simulate async operation
+
+        var certificate = _certificates.FirstOrDefault(c => c.CertificateId == certificateId);
+        if (certificate == null)
+        {
+            return null;
+        }
+
+        var dto = MapToDto(certificate);
+        return BuildMinimalPdf(dto);
+    }
+
+    private static byte[] BuildMinimalPdf(CertificateDto cert)
+    {
+        // Build the page content stream using standard PDF Type1 font (Helvetica)
+        var content = new System.Text.StringBuilder();
+        content.AppendLine("BT");
+        content.AppendLine("/F1 28 Tf");
+        content.AppendLine("160 720 Td");
+        content.AppendLine($"(Certificate of Completion) Tj");
+        content.AppendLine("/F1 18 Tf");
+        content.AppendLine("0 -60 Td");
+        content.AppendLine($"(This certifies that) Tj");
+        content.AppendLine("/F1 22 Tf");
+        content.AppendLine("0 -40 Td");
+        var displayName = cert.StudentName.Length > 60 ? cert.StudentName[..60] + "..." : cert.StudentName;
+        content.AppendLine($"({EscapePdfString(displayName)}) Tj");
+        content.AppendLine("/F1 16 Tf");
+        content.AppendLine("0 -40 Td");
+        content.AppendLine("(has successfully completed the course:) Tj");
+        content.AppendLine("/F1 20 Tf");
+        content.AppendLine("0 -36 Td");
+        content.AppendLine($"({EscapePdfString(cert.CourseName)}) Tj");
+        content.AppendLine("/F1 14 Tf");
+        content.AppendLine("0 -50 Td");
+        content.AppendLine($"(Instructor: {EscapePdfString(cert.InstructorName)}) Tj");
+        content.AppendLine("0 -24 Td");
+        content.AppendLine($"(Issue Date: {cert.IssueDate.ToUniversalTime():yyyy-MM-ddTHH:mm:ssZ}) Tj");
+        content.AppendLine("0 -24 Td");
+        content.AppendLine($"(Certificate No: {EscapePdfString(cert.CertificateNumber)}) Tj");
+        content.AppendLine("0 -24 Td");
+        content.AppendLine($"(Grade: {cert.FinalGrade}) Tj");
+        content.AppendLine("ET");
+
+        var streamBytes = System.Text.Encoding.Latin1.GetBytes(content.ToString());
+        var streamLength = streamBytes.Length;
+
+        // Assemble PDF objects
+        var objects = new List<string>();
+
+        // Object 1: Catalog
+        objects.Add("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj");
+        // Object 2: Pages
+        objects.Add("2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj");
+        // Object 3: Page
+        objects.Add("3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792]\n   /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj");
+        // Object 4: Content stream
+        objects.Add($"4 0 obj\n<< /Length {streamLength} >>\nstream\n{content}endstream\nendobj");
+        // Object 5: Font
+        objects.Add("5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj");
+
+        // Build xref table
+        var pdfBuilder = new System.Text.StringBuilder();
+        pdfBuilder.Append("%PDF-1.4\n");
+
+        var offsets = new List<int>();
+        foreach (var obj in objects)
+        {
+            offsets.Add(pdfBuilder.Length);
+            pdfBuilder.Append(obj);
+            pdfBuilder.Append("\n");
+        }
+
+        var xrefOffset = pdfBuilder.Length;
+        pdfBuilder.Append("xref\n");
+        pdfBuilder.Append($"0 {objects.Count + 1}\n");
+        pdfBuilder.Append("0000000000 65535 f \n");
+        foreach (var offset in offsets)
+        {
+            pdfBuilder.Append($"{offset:D10} 00000 n \n");
+        }
+        pdfBuilder.Append("trailer\n");
+        pdfBuilder.Append($"<< /Size {objects.Count + 1} /Root 1 0 R >>\n");
+        pdfBuilder.Append("startxref\n");
+        pdfBuilder.Append($"{xrefOffset}\n");
+        pdfBuilder.Append("%%EOF\n");
+
+        return System.Text.Encoding.Latin1.GetBytes(pdfBuilder.ToString());
+    }
+
+    private static string EscapePdfString(string input)
+    {
+        // Filter to Latin1 (ISO-8859-1) range, then escape special PDF string characters
+        var latin1Safe = new System.Text.StringBuilder(input.Length);
+        foreach (var ch in input)
+        {
+            if (ch <= 0xFF)
+            {
+                latin1Safe.Append(ch);
+            }
+            else
+            {
+                latin1Safe.Append('?');
+            }
+        }
+
+        return latin1Safe.ToString()
+            .Replace("\\", "\\\\")
+            .Replace("(", "\\(")
+            .Replace(")", "\\)")
+            .Replace("\r", "")
+            .Replace("\n", " ");
+    }
+
     private CertificateDto MapToDto(Certificate certificate)
     {
         var student = _students.FirstOrDefault(s => s.StudentId == certificate.StudentId);
