@@ -15,10 +15,13 @@ public class CourseRegistrationDbContextFactory : IDesignTimeDbContextFactory<Co
     {
         var optionsBuilder = new DbContextOptionsBuilder<CourseRegistrationDbContext>();
 
-        // Use SQL Server for migrations with a default connection string
-        // This connection string can be overridden at runtime via configuration
+        // Use SQL Server for migrations
+        // Connection string can be overridden via environment variable
+        var connectionString = Environment.GetEnvironmentVariable("MIGRATION_CONNECTION_STRING")
+            ?? "Server=localhost,1433;Database=CourseRegistrationDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=true";
+
         optionsBuilder.UseSqlServer(
-            "Server=(localdb)\\mssqllocaldb;Database=CourseRegistrationDb;Trusted_Connection=True;MultipleActiveResultSets=true",
+            connectionString,
             options => options.MigrationsAssembly("CourseRegistration.Infrastructure"));
 
         return new CourseRegistrationDbContext(optionsBuilder.Options);
