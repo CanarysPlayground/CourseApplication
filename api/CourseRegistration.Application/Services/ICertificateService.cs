@@ -40,4 +40,11 @@ public interface ICertificateService
     /// </summary>
     /// <returns>Unique certificate number</returns>
     string GenerateCertificateNumber();
+
+    /// <summary>
+    /// Generate a PDF byte array for the given certificate
+    /// </summary>
+    /// <param name="certificateId">Certificate ID</param>
+    /// <returns>PDF bytes, or null if the certificate is not found</returns>
+    Task<byte[]?> DownloadCertificatePdfAsync(Guid certificateId);
 }
