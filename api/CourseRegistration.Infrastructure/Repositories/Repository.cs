@@ -76,8 +76,8 @@ public class Repository<T> : IRepository<T> where T : class
     /// </summary>
     public virtual async Task<T> AddAsync(T entity)
     {
-        var result = await _dbSet.AddAsync(entity);
-        return result.Entity;
+        var addedEntityEntry = await _dbSet.AddAsync(entity);
+        return addedEntityEntry.Entity;
     }
 
     /// <summary>

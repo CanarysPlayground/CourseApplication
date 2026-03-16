@@ -275,65 +275,65 @@ public static class AdminAccessChecker
     /// <returns>AdminValidationResult with detailed validation information</returns>
     public static AdminValidationResult ValidateAdminAccess(User? user, ClaimsPrincipal? principal, ILogger? logger = null)
     {
-        var result = new AdminValidationResult();
+        var adminValidationResult = new AdminValidationResult();
         
         try
         {
             // User object validation
-            result.UserObjectValid = user != null;
-            if (!result.UserObjectValid)
+            adminValidationResult.UserObjectValid = user != null;
+            if (!adminValidationResult.UserObjectValid)
             {
-                result.FailureReason = "User object is null";
-                logger?.LogWarning("Admin validation failed: {Reason}", result.FailureReason);
-                return result;
+                adminValidationResult.FailureReason = "User object is null";
+                logger?.LogWarning("Admin validation failed: {Reason}", adminValidationResult.FailureReason);
+                return adminValidationResult;
             }
 
             // Account status validation
-            result.AccountActive = user!.IsActive;
-            if (!result.AccountActive)
+            adminValidationResult.AccountActive = user!.IsActive;
+            if (!adminValidationResult.AccountActive)
             {
-                result.FailureReason = "User account is inactive";
-                logger?.LogWarning("Admin validation failed for user {UserId}: {Reason}", user.UserId, result.FailureReason);
-                return result;
+                adminValidationResult.FailureReason = "User account is inactive";
+                logger?.LogWarning("Admin validation failed for user {UserId}: {Reason}", user.UserId, adminValidationResult.FailureReason);
+                return adminValidationResult;
             }
 
             // Role validation
-            result.HasValidRole = user.Role == UserRole.Admin || user.Role == UserRole.SuperAdmin;
-            if (!result.HasValidRole)
+            adminValidationResult.HasValidRole = user.Role == UserRole.Admin || user.Role == UserRole.SuperAdmin;
+            if (!adminValidationResult.HasValidRole)
             {
-                result.FailureReason = $"User has insufficient role: {user.Role}";
-                logger?.LogInformation("Admin validation failed for user {UserId}: {Reason}", user.UserId, result.FailureReason);
-                return result;
+                adminValidationResult.FailureReason = $"User has insufficient role: {user.Role}";
+                logger?.LogInformation("Admin validation failed for user {UserId}: {Reason}", user.UserId, adminValidationResult.FailureReason);
+                return adminValidationResult;
             }
 
             // Claims validation
-            result.ClaimsValid = HasAdminAccessFromClaims(principal, logger);
-            if (!result.ClaimsValid)
+            adminValidationResult.ClaimsValid = HasAdminAccessFromClaims(principal, logger);
+            if (!adminValidationResult.ClaimsValid)
             {
-                result.FailureReason = "Invalid or missing claims";
-                return result;
+                adminValidationResult.FailureReason = "Invalid or missing claims";
+                return adminValidationResult;
             }
 
             // Time-based validation
-            result.WithinAllowedTime = ValidateSecureAdminAccess(user, DateTime.UtcNow, logger);
-            if (!result.WithinAllowedTime)
+            adminValidationResult.WithinAllowedTime = ValidateSecureAdminAccess(user, DateTime.UtcNow, logger);
+            if (!adminValidationResult.WithinAllowedTime)
             {
-                result.FailureReason = "Access denied due to time restrictions";
-                return result;
+                adminValidationResult.FailureReason = "Access denied due to time restrictions";
+                return adminValidationResult;
             }
 
-            result.IsValid = true;
-            result.ValidatedAt = DateTime.UtcNow;
+            adminValidationResult.IsValid = true;
+            adminValidationResult.ValidatedAt = DateTime.UtcNow;
             
             logger?.LogInformation("Admin access validation successful for user {UserId}", user.UserId);
             
-            return result;
+            return adminValidationResult;
         }
         catch (Exception ex)
         {
-            result.FailureReason = "Validation error occurred";
+            adminValidationResult.FailureReason = "Validation error occurred";
             logger?.LogError(ex, "Error during admin access validation for user {UserId}", user?.UserId);
-            return result;
+            return adminValidationResult;
         }
     }
 }
