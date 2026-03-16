@@ -45,10 +45,10 @@ public class ExceptionHandlingMiddleware
         
         _logger.LogError(exception, "An unhandled exception occurred. CorrelationId: {CorrelationId}", correlationId);
 
-        var response = context.Response;
-        response.ContentType = "application/json";
+        var httpResponse = context.Response;
+        httpResponse.ContentType = "application/json";
 
-        var errorResponse = new ApiResponseDto<object>
+        var apiErrorResponse = new ApiResponseDto<object>
         {
             Success = false,
             Data = null
@@ -57,58 +57,58 @@ public class ExceptionHandlingMiddleware
         switch (exception)
         {
             case ArgumentException argEx:
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
-                errorResponse.Message = "Invalid argument provided";
-                errorResponse.Errors = new[] { argEx.Message };
+                httpResponse.StatusCode = (int)HttpStatusCode.BadRequest;
+                apiErrorResponse.Message = "Invalid argument provided";
+                apiErrorResponse.Errors = new[] { argEx.Message };
                 break;
 
             case InvalidOperationException invOpEx:
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
-                errorResponse.Message = "Invalid operation";
-                errorResponse.Errors = new[] { invOpEx.Message };
+                httpResponse.StatusCode = (int)HttpStatusCode.BadRequest;
+                apiErrorResponse.Message = "Invalid operation";
+                apiErrorResponse.Errors = new[] { invOpEx.Message };
                 break;
 
             case UnauthorizedAccessException:
-                response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                errorResponse.Message = "Unauthorized access";
-                errorResponse.Errors = new[] { "You are not authorized to perform this action" };
+                httpResponse.StatusCode = (int)HttpStatusCode.Unauthorized;
+                apiErrorResponse.Message = "Unauthorized access";
+                apiErrorResponse.Errors = new[] { "You are not authorized to perform this action" };
                 break;
 
             case KeyNotFoundException:
-                response.StatusCode = (int)HttpStatusCode.NotFound;
-                errorResponse.Message = "Resource not found";
-                errorResponse.Errors = new[] { "The requested resource was not found" };
+                httpResponse.StatusCode = (int)HttpStatusCode.NotFound;
+                apiErrorResponse.Message = "Resource not found";
+                apiErrorResponse.Errors = new[] { "The requested resource was not found" };
                 break;
 
             case TimeoutException:
-                response.StatusCode = (int)HttpStatusCode.RequestTimeout;
-                errorResponse.Message = "Request timeout";
-                errorResponse.Errors = new[] { "The request timed out" };
+                httpResponse.StatusCode = (int)HttpStatusCode.RequestTimeout;
+                apiErrorResponse.Message = "Request timeout";
+                apiErrorResponse.Errors = new[] { "The request timed out" };
                 break;
 
             default:
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                errorResponse.Message = "An internal server error occurred";
+                httpResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
+                apiErrorResponse.Message = "An internal server error occurred";
                 
                 // In development, include the full exception details
                 if (context.RequestServices.GetService<IWebHostEnvironment>()?.IsDevelopment() == true)
                 {
-                    errorResponse.Errors = new[] { exception.Message, exception.StackTrace ?? string.Empty };
+                    apiErrorResponse.Errors = new[] { exception.Message, exception.StackTrace ?? string.Empty };
                 }
                 else
                 {
-                    errorResponse.Errors = new[] { "Please contact support with correlation ID: " + correlationId };
+                    apiErrorResponse.Errors = new[] { "Please contact support with correlation ID: " + correlationId };
                 }
                 break;
         }
 
-        var jsonOptions = new JsonSerializerOptions
+        var camelCaseJsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true
         };
 
-        var jsonResponse = JsonSerializer.Serialize(errorResponse, jsonOptions);
-        await response.WriteAsync(jsonResponse);
+        var jsonResponse = JsonSerializer.Serialize(apiErrorResponse, camelCaseJsonOptions);
+        await httpResponse.WriteAsync(jsonResponse);
     }
 }

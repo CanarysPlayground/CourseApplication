@@ -47,8 +47,8 @@ public class RegistrationsController : ControllerBase
         _logger.LogInformation("Getting registrations with page: {Page}, pageSize: {PageSize}, studentId: {StudentId}, courseId: {CourseId}, status: {Status}", 
             page, pageSize, studentId, courseId, status);
         
-        var result = await _registrationService.GetRegistrationsAsync(page, pageSize, studentId, courseId, status);
-        return Ok(ApiResponseDto<PagedResponseDto<RegistrationDto>>.SuccessResponse(result, "Registrations retrieved successfully"));
+        var pagedRegistrations = await _registrationService.GetRegistrationsAsync(page, pageSize, studentId, courseId, status);
+        return Ok(ApiResponseDto<PagedResponseDto<RegistrationDto>>.SuccessResponse(pagedRegistrations, "Registrations retrieved successfully"));
     }
 
     /// <summary>
@@ -132,8 +132,8 @@ public class RegistrationsController : ControllerBase
     {
         _logger.LogInformation("Cancelling registration with ID: {RegistrationId}", id);
         
-        var result = await _registrationService.CancelRegistrationAsync(id);
-        if (!result)
+        var isRegistrationCancelled = await _registrationService.CancelRegistrationAsync(id);
+        if (!isRegistrationCancelled)
         {
             return NotFound(ApiResponseDto<object>.ErrorResponse("Registration not found"));
         }

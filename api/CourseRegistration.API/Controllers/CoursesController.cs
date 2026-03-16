@@ -44,8 +44,8 @@ public class CoursesController : ControllerBase
         _logger.LogInformation("Getting courses with page: {Page}, pageSize: {PageSize}, searchTerm: {SearchTerm}, instructor: {Instructor}", 
             page, pageSize, searchTerm, instructor);
         
-        var result = await _courseService.GetCoursesAsync(page, pageSize, searchTerm, instructor);
-        return Ok(ApiResponseDto<PagedResponseDto<CourseDto>>.SuccessResponse(result, "Courses retrieved successfully"));
+        var pagedCourses = await _courseService.GetCoursesAsync(page, pageSize, searchTerm, instructor);
+        return Ok(ApiResponseDto<PagedResponseDto<CourseDto>>.SuccessResponse(pagedCourses, "Courses retrieved successfully"));
     }
 
     /// <summary>
@@ -125,8 +125,8 @@ public class CoursesController : ControllerBase
     {
         _logger.LogInformation("Deleting course with ID: {CourseId}", id);
         
-        var result = await _courseService.DeleteCourseAsync(id);
-        if (!result)
+        var isCourseDeleted = await _courseService.DeleteCourseAsync(id);
+        if (!isCourseDeleted)
         {
             return NotFound(ApiResponseDto<object>.ErrorResponse("Course not found"));
         }

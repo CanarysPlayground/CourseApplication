@@ -3,7 +3,7 @@ const API_BASE_URL = 'http://localhost:5210/api';
 
 // DOM Elements
 const addCourseForm = document.getElementById('add-course-form');
-const submitBtn = document.getElementById('submit-btn');
+const submitButton = document.getElementById('submit-btn');
 const submitText = document.getElementById('submit-text');
 const loadingOverlay = document.getElementById('loading-overlay');
 
@@ -61,12 +61,12 @@ function initializeForm() {
     addCourseForm.addEventListener('submit', handleFormSubmit);
 
     // Instructor name validation (letters, spaces, periods only)
-    document.getElementById('instructorName').addEventListener('input', function(e) {
-        const value = e.target.value;
+    document.getElementById('instructorName').addEventListener('input', function(inputEvent) {
+        const value = inputEvent.target.value;
         const validPattern = /^[a-zA-Z\s.]*$/;
         
         if (!validPattern.test(value)) {
-            e.target.value = value.replace(/[^a-zA-Z\s.]/g, '');
+            inputEvent.target.value = value.replace(/[^a-zA-Z\s.]/g, '');
         }
     });
 
@@ -80,8 +80,8 @@ function initializeForm() {
 }
 
 // Form Submission Handler
-async function handleFormSubmit(e) {
-    e.preventDefault();
+async function handleFormSubmit(submitEvent) {
+    submitEvent.preventDefault();
     
     if (!validateForm()) {
         return;
@@ -252,8 +252,8 @@ function clearAllErrors() {
     const errorElements = document.querySelectorAll('.error-message');
     const inputElements = document.querySelectorAll('.form-input, .form-textarea');
     
-    errorElements.forEach(el => el.textContent = '');
-    inputElements.forEach(el => el.classList.remove('error'));
+    errorElements.forEach(errorElement => errorElement.textContent = '');
+    inputElements.forEach(inputElement => inputElement.classList.remove('error'));
 }
 
 function displayValidationErrors(errors) {
@@ -285,13 +285,13 @@ function mapFieldName(apiFieldName) {
 
 // UI State Functions
 function setSubmitButton(loading, text) {
-    submitBtn.disabled = loading;
+    submitButton.disabled = loading;
     submitText.textContent = text;
     
     if (loading) {
-        submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${text}`;
+        submitButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${text}`;
     } else {
-        submitBtn.innerHTML = `<i class="fas fa-plus"></i> ${text}`;
+        submitButton.innerHTML = `<i class="fas fa-plus"></i> ${text}`;
     }
 }
 
@@ -566,18 +566,18 @@ function getCourseStatusText(startDate, endDate) {
 }
 
 // Keyboard Navigation
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function(keyboardEvent) {
     // Close modals with Escape key
-    if (e.key === 'Escape') {
+    if (keyboardEvent.key === 'Escape') {
         const openModals = document.querySelectorAll('.modal:not(.hidden)');
         openModals.forEach(modal => modal.classList.add('hidden'));
     }
 });
 
 // Click outside modal to close
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('modal')) {
-        e.target.classList.add('hidden');
+document.addEventListener('click', function(clickEvent) {
+    if (clickEvent.target.classList.contains('modal')) {
+        clickEvent.target.classList.add('hidden');
     }
 });
 
@@ -760,8 +760,8 @@ async function loadCoursesForDropdown() {
 document.addEventListener('DOMContentLoaded', function() {
     const createRegistrationForm = document.getElementById('create-registration-form');
     if (createRegistrationForm) {
-        createRegistrationForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
+        createRegistrationForm.addEventListener('submit', async function(submitEvent) {
+            submitEvent.preventDefault();
             
             const formData = {
                 studentId: document.getElementById('registration-student').value,

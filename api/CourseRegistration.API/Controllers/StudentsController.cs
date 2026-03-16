@@ -39,8 +39,8 @@ public class StudentsController : ControllerBase
     {
         _logger.LogInformation("Getting students with page: {Page}, pageSize: {PageSize}", page, pageSize);
         
-        var result = await _studentService.GetStudentsAsync(page, pageSize);
-        return Ok(ApiResponseDto<PagedResponseDto<StudentDto>>.SuccessResponse(result, "Students retrieved successfully"));
+        var pagedStudents = await _studentService.GetStudentsAsync(page, pageSize);
+        return Ok(ApiResponseDto<PagedResponseDto<StudentDto>>.SuccessResponse(pagedStudents, "Students retrieved successfully"));
     }
 
     /// <summary>
@@ -119,8 +119,8 @@ public class StudentsController : ControllerBase
     {
         _logger.LogInformation("Deleting student with ID: {StudentId}", id);
         
-        var result = await _studentService.DeleteStudentAsync(id);
-        if (!result)
+        var isStudentDeleted = await _studentService.DeleteStudentAsync(id);
+        if (!isStudentDeleted)
         {
             return NotFound(ApiResponseDto<object>.ErrorResponse("Student not found"));
         }
