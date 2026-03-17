@@ -37,9 +37,10 @@ public class CourseService : ICourseService
 
         if (!string.IsNullOrWhiteSpace(searchTerm) || !string.IsNullOrWhiteSpace(instructor))
         {
-            courses = await _unitOfWork.Courses.SearchCoursesAsync(searchTerm, instructor);
-            totalCourses = courses.Count();
-            courses = courses.Skip((page - 1) * pageSize).Take(pageSize);
+            // Use optimized paged search that counts and paginates at database level
+            var result = await _unitOfWork.Courses.SearchCoursesPagedAsync(searchTerm, instructor, page, pageSize);
+            courses = result.Courses;
+            totalCourses = result.TotalCount;
         }
         else
         {

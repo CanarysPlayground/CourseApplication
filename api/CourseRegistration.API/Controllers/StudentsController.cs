@@ -155,15 +155,20 @@ public class StudentsController : ControllerBase
     public async Task<ActionResult<ApiResponseDto<IEnumerable<RegistrationDto>>>> GetStudentRegistrations(Guid id)
     {
         _logger.LogInformation("Getting registrations for student ID: {StudentId}", id);
-        
-        // First check if student exists
-        var student = await _studentService.GetStudentByIdAsync(id);
-        if (student == null)
+
+        // Get registrations directly - this method returns empty list if student doesn't exist
+        var registrations = await _studentService.GetStudentRegistrationsAsync(id);
+
+        // If no registrations and student doesn't exist, return 404
+        if (!registrations.Any())
         {
-            return NotFound(ApiResponseDto<IEnumerable<RegistrationDto>>.ErrorResponse("Student not found"));
+            var student = await _studentService.GetStudentByIdAsync(id);
+            if (student == null)
+            {
+                return NotFound(ApiResponseDto<IEnumerable<RegistrationDto>>.ErrorResponse("Student not found"));
+            }
         }
 
-        var registrations = await _studentService.GetStudentRegistrationsAsync(id);
         return Ok(ApiResponseDto<IEnumerable<RegistrationDto>>.SuccessResponse(registrations, "Student registrations retrieved successfully"));
     }
 }
