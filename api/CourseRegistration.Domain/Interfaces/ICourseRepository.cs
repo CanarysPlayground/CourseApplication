@@ -18,6 +18,11 @@ public interface ICourseRepository : IRepository<Course>
     Task<IEnumerable<Course>> SearchCoursesAsync(string? searchTerm, string? instructor);
 
     /// <summary>
+    /// Searches courses with pagination support (database-level)
+    /// </summary>
+    Task<(IEnumerable<Course> Courses, int TotalCount)> SearchCoursesPagedAsync(string? searchTerm, string? instructor, int page, int pageSize);
+
+    /// <summary>
     /// Gets active courses asynchronously
     /// </summary>
     Task<IEnumerable<Course>> GetActiveCoursesAsync();

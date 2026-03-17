@@ -192,15 +192,20 @@ public class CoursesController : ControllerBase
     public async Task<ActionResult<ApiResponseDto<IEnumerable<RegistrationDto>>>> GetCourseRegistrations(Guid id)
     {
         _logger.LogInformation("Getting registrations for course ID: {CourseId}", id);
-        
-        // First check if course exists
-        var course = await _courseService.GetCourseByIdAsync(id);
-        if (course == null)
+
+        // Get registrations directly - this method returns empty list if course doesn't exist
+        var registrations = await _courseService.GetCourseRegistrationsAsync(id);
+
+        // If no registrations and course doesn't exist, return 404
+        if (!registrations.Any())
         {
-            return NotFound(ApiResponseDto<IEnumerable<RegistrationDto>>.ErrorResponse("Course not found"));
+            var course = await _courseService.GetCourseByIdAsync(id);
+            if (course == null)
+            {
+                return NotFound(ApiResponseDto<IEnumerable<RegistrationDto>>.ErrorResponse("Course not found"));
+            }
         }
 
-        var registrations = await _courseService.GetCourseRegistrationsAsync(id);
         return Ok(ApiResponseDto<IEnumerable<RegistrationDto>>.SuccessResponse(registrations, "Course registrations retrieved successfully"));
     }
 }

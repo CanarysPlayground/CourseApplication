@@ -35,12 +35,12 @@ public class CourseRepository : Repository<Course>, ICourseRepository
     /// </summary>
     public async Task<IEnumerable<Course>> SearchCoursesAsync(string? searchTerm, string? instructor)
     {
-        var query = _dbSet.Where(c => c.IsActive);
+        var query = _dbSet.AsNoTracking().Where(c => c.IsActive);
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             var lowerSearchTerm = searchTerm.ToLower();
-            query = query.Where(c => 
+            query = query.Where(c =>
                 c.CourseName.ToLower().Contains(lowerSearchTerm) ||
                 (c.Description != null && c.Description.ToLower().Contains(lowerSearchTerm)));
         }
@@ -57,11 +57,54 @@ public class CourseRepository : Repository<Course>, ICourseRepository
     }
 
     /// <summary>
+    /// Searches courses with pagination support (database-level pagination and count)
+    /// </summary>
+    public async Task<(IEnumerable<Course> Courses, int TotalCount)> SearchCoursesPagedAsync(
+        string? searchTerm,
+        string? instructor,
+        int page,
+        int pageSize)
+    {
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 10;
+        if (pageSize > 100) pageSize = 100;
+
+        var query = _dbSet.AsNoTracking().Where(c => c.IsActive);
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var lowerSearchTerm = searchTerm.ToLower();
+            query = query.Where(c =>
+                c.CourseName.ToLower().Contains(lowerSearchTerm) ||
+                (c.Description != null && c.Description.ToLower().Contains(lowerSearchTerm)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(instructor))
+        {
+            var lowerInstructor = instructor.ToLower();
+            query = query.Where(c => c.InstructorName.ToLower().Contains(lowerInstructor));
+        }
+
+        // Get total count BEFORE pagination
+        var totalCount = await query.CountAsync();
+
+        // Apply pagination at database level
+        var courses = await query
+            .OrderBy(c => c.CourseName)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (courses, totalCount);
+    }
+
+    /// <summary>
     /// Gets active courses asynchronously
     /// </summary>
     public async Task<IEnumerable<Course>> GetActiveCoursesAsync()
     {
         return await _dbSet
+            .AsNoTracking()
             .Where(c => c.IsActive)
             .OrderBy(c => c.CourseName)
             .ToListAsync();
@@ -69,13 +112,14 @@ public class CourseRepository : Repository<Course>, ICourseRepository
 
     /// <summary>
     /// Gets courses available for registration (active and not full) asynchronously
+    /// Optimized to not load all registrations
     /// </summary>
     public async Task<IEnumerable<Course>> GetAvailableCoursesAsync()
     {
         var currentDate = DateTime.UtcNow;
-        
+
         return await _dbSet
-            .Include(c => c.Registrations)
+            .AsNoTracking()
             .Where(c => c.IsActive && c.StartDate > currentDate)
             .OrderBy(c => c.StartDate)
             .ThenBy(c => c.CourseName)
@@ -92,6 +136,7 @@ public class CourseRepository : Repository<Course>, ICourseRepository
 
         var lowerInstructorName = instructorName.ToLower();
         return await _dbSet
+            .AsNoTracking()
             .Where(c => c.IsActive && c.InstructorName.ToLower().Contains(lowerInstructorName))
             .OrderBy(c => c.CourseName)
             .ToListAsync();

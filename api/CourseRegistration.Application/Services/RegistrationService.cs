@@ -28,10 +28,10 @@ public class RegistrationService : IRegistrationService
     /// Gets all registrations with pagination and filtering
     /// </summary>
     public async Task<PagedResponseDto<RegistrationDto>> GetRegistrationsAsync(
-        int page = 1, 
-        int pageSize = 10, 
-        Guid? studentId = null, 
-        Guid? courseId = null, 
+        int page = 1,
+        int pageSize = 10,
+        Guid? studentId = null,
+        Guid? courseId = null,
         RegistrationStatus? status = null)
     {
         if (page < 1) page = 1;
@@ -43,9 +43,11 @@ public class RegistrationService : IRegistrationService
 
         if (studentId.HasValue || courseId.HasValue || status.HasValue)
         {
-            registrations = await _unitOfWork.Registrations.GetRegistrationsWithFiltersAsync(studentId, courseId, status);
-            totalRegistrations = registrations.Count();
-            registrations = registrations.Skip((page - 1) * pageSize).Take(pageSize);
+            // Use optimized paged method that counts and paginates at database level
+            var result = await _unitOfWork.Registrations.GetRegistrationsWithFiltersPagedAsync(
+                studentId, courseId, status, page, pageSize);
+            registrations = result.Registrations;
+            totalRegistrations = result.TotalCount;
         }
         else
         {

@@ -37,7 +37,17 @@ public interface IRegistrationRepository : IRepository<Registration>
     /// Gets registrations with filtering options asynchronously
     /// </summary>
     Task<IEnumerable<Registration>> GetRegistrationsWithFiltersAsync(
-        Guid? studentId = null, 
-        Guid? courseId = null, 
+        Guid? studentId = null,
+        Guid? courseId = null,
         RegistrationStatus? status = null);
+
+    /// <summary>
+    /// Gets registrations with filtering and pagination at database level
+    /// </summary>
+    Task<(IEnumerable<Registration> Registrations, int TotalCount)> GetRegistrationsWithFiltersPagedAsync(
+        Guid? studentId,
+        Guid? courseId,
+        RegistrationStatus? status,
+        int page,
+        int pageSize);
 }

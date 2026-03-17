@@ -44,6 +44,7 @@ public class CourseRegistrationDbContext : DbContext
         {
             entity.HasKey(s => s.StudentId);
             entity.HasIndex(s => s.Email).IsUnique();
+            entity.HasIndex(s => s.IsActive); // Performance: frequently filtered field
             entity.Property(s => s.FirstName).IsRequired().HasMaxLength(50);
             entity.Property(s => s.LastName).IsRequired().HasMaxLength(50);
             entity.Property(s => s.Email).IsRequired().HasMaxLength(256);
@@ -64,6 +65,9 @@ public class CourseRegistrationDbContext : DbContext
         modelBuilder.Entity<Course>(entity =>
         {
             entity.HasKey(c => c.CourseId);
+            entity.HasIndex(c => c.IsActive); // Performance: frequently filtered field
+            entity.HasIndex(c => c.InstructorName); // Performance: search queries on instructor
+            entity.HasIndex(c => new { c.IsActive, c.StartDate }); // Performance: composite index for available courses query
             entity.Property(c => c.CourseName).IsRequired().HasMaxLength(100);
             entity.Property(c => c.Description).HasMaxLength(500);
             entity.Property(c => c.InstructorName).IsRequired().HasMaxLength(100);
@@ -96,6 +100,11 @@ public class CourseRegistrationDbContext : DbContext
             // Create unique constraint to prevent duplicate registrations
             entity.HasIndex(r => new { r.StudentId, r.CourseId })
                   .IsUnique();
+
+            // Performance indexes for frequently queried fields
+            entity.HasIndex(r => r.Status); // Filtered by status frequently
+            entity.HasIndex(r => r.StudentId); // Already covered by composite unique index above but explicit for clarity
+            entity.HasIndex(r => r.CourseId); // Already covered by foreign key but explicit for clarity
 
             // Configure relationships
             entity.HasOne(r => r.Student)

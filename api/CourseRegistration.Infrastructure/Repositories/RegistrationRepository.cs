@@ -85,8 +85,8 @@ public class RegistrationRepository : Repository<Registration>, IRegistrationRep
     /// Gets registrations with filtering options asynchronously
     /// </summary>
     public async Task<IEnumerable<Registration>> GetRegistrationsWithFiltersAsync(
-        Guid? studentId = null, 
-        Guid? courseId = null, 
+        Guid? studentId = null,
+        Guid? courseId = null,
         RegistrationStatus? status = null)
     {
         var query = _dbSet
@@ -112,6 +112,53 @@ public class RegistrationRepository : Repository<Registration>, IRegistrationRep
         return await query
             .OrderByDescending(r => r.RegistrationDate)
             .ToListAsync();
+    }
+
+    /// <summary>
+    /// Gets registrations with filtering and pagination at database level (optimized)
+    /// </summary>
+    public async Task<(IEnumerable<Registration> Registrations, int TotalCount)> GetRegistrationsWithFiltersPagedAsync(
+        Guid? studentId,
+        Guid? courseId,
+        RegistrationStatus? status,
+        int page,
+        int pageSize)
+    {
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 10;
+        if (pageSize > 100) pageSize = 100;
+
+        var query = _dbSet
+            .Include(r => r.Student)
+            .Include(r => r.Course)
+            .AsQueryable();
+
+        if (studentId.HasValue)
+        {
+            query = query.Where(r => r.StudentId == studentId.Value);
+        }
+
+        if (courseId.HasValue)
+        {
+            query = query.Where(r => r.CourseId == courseId.Value);
+        }
+
+        if (status.HasValue)
+        {
+            query = query.Where(r => r.Status == status.Value);
+        }
+
+        // Get total count BEFORE pagination
+        var totalCount = await query.CountAsync();
+
+        // Apply pagination at database level
+        var registrations = await query
+            .OrderByDescending(r => r.RegistrationDate)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (registrations, totalCount);
     }
 
     /// <summary>
