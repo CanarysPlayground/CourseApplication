@@ -904,3 +904,109 @@ window.showCreateRegistration = showCreateRegistration;
 window.showRegistrationDetails = showRegistrationDetails;
 window.refreshRegistrations = refreshRegistrations;
 window.applyFilters = applyFilters;
+// ============================================================================
+// DOWNLOAD FUNCTIONALITY
+// ============================================================================
+
+/**
+ * Triggers a CSV download for all courses via the backend API.
+ * Uses the browser's native download mechanism.
+ * Displays an error modal if the download request fails.
+ */
+async function downloadCoursesCsv() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/downloads/courses`);
+
+        if (!response.ok) {
+            const errorText = await response.text().catch(() => '');
+            const message = errorText || `Server returned status ${response.status}`;
+            showErrorModal(`Failed to download courses: ${message}`);
+            return;
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const filename = getFilenameFromResponse(response) || `courses_${formatDateForFilename()}.csv`;
+        triggerBrowserDownload(url, filename);
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error downloading courses CSV:', error);
+        showErrorModal('Network error while downloading courses. Please check your connection and try again.');
+    }
+}
+
+/**
+ * Triggers a CSV download for all registrations via the backend API.
+ * Uses the browser's native download mechanism.
+ * Displays an error modal if the download request fails.
+ */
+async function downloadRegistrationsCsv() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/downloads/registrations`);
+
+        if (!response.ok) {
+            const errorText = await response.text().catch(() => '');
+            const message = errorText || `Server returned status ${response.status}`;
+            showErrorModal(`Failed to download registrations: ${message}`);
+            return;
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const filename = getFilenameFromResponse(response) || `registrations_${formatDateForFilename()}.csv`;
+        triggerBrowserDownload(url, filename);
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error downloading registrations CSV:', error);
+        showErrorModal('Network error while downloading registrations. Please check your connection and try again.');
+    }
+}
+
+/**
+ * Creates a temporary anchor element to trigger a file download in the browser.
+ * @param {string} url - Object URL pointing to the file blob
+ * @param {string} filename - The name to use for the downloaded file
+ */
+function triggerBrowserDownload(url, filename) {
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+}
+
+/**
+ * Attempts to extract the filename from the Content-Disposition response header.
+ * Handles the standard RFC 6266 `filename` parameter (e.g. filename="courses_20260319.csv").
+ * RFC 5987 `filename*` encoded parameters are not handled; the caller should provide a fallback.
+ * Returns null if the header is absent or does not contain a recognisable filename.
+ * @param {Response} response - The fetch Response object
+ * @returns {string|null}
+ */
+function getFilenameFromResponse(response) {
+    const disposition = response.headers.get('Content-Disposition');
+    if (!disposition) return null;
+    const match = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+    if (match && match[1]) {
+        return match[1].replace(/['"]/g, '');
+    }
+    return null;
+}
+
+/**
+ * Returns today's date in UTC formatted as YYYYMMDD for use in filenames.
+ * UTC is used to match the convention used by the backend API.
+ * @returns {string}
+ */
+function formatDateForFilename() {
+    const now = new Date();
+    const y = now.getUTCFullYear();
+    const m = String(now.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(now.getUTCDate()).padStart(2, '0');
+    return `${y}${m}${d}`;
+}
+
+// Export download functions for global access
+window.downloadCoursesCsv = downloadCoursesCsv;
+window.downloadRegistrationsCsv = downloadRegistrationsCsv;
