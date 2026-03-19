@@ -57,4 +57,9 @@ public interface IRegistrationService
     /// Checks if a student is already registered for a course
     /// </summary>
     Task<bool> IsStudentRegisteredForCourseAsync(Guid studentId, Guid courseId);
+
+    /// <summary>
+    /// Gets all registrations without pagination
+    /// </summary>
+    Task<IEnumerable<RegistrationDto>> GetAllRegistrationsAsync();
 }

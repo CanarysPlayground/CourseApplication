@@ -213,6 +213,15 @@ public class RegistrationService : IRegistrationService
     }
 
     /// <summary>
+    /// Gets all registrations without pagination
+    /// </summary>
+    public async Task<IEnumerable<RegistrationDto>> GetAllRegistrationsAsync()
+    {
+        var registrations = await _unitOfWork.Registrations.GetRegistrationsWithFiltersAsync(null, null, null);
+        return _mapper.Map<IEnumerable<RegistrationDto>>(registrations);
+    }
+
+    /// <summary>
     /// Validates if a status transition is allowed
     /// </summary>
     private static bool IsValidStatusTransition(RegistrationStatus currentStatus, RegistrationStatus newStatus)
