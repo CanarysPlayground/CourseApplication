@@ -904,3 +904,42 @@ window.showCreateRegistration = showCreateRegistration;
 window.showRegistrationDetails = showRegistrationDetails;
 window.refreshRegistrations = refreshRegistrations;
 window.applyFilters = applyFilters;
+
+// ============================================================================
+// DOWNLOAD FUNCTIONALITY
+// ============================================================================
+
+async function downloadCsv(type) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/download/${type}`);
+
+        if (!response.ok) {
+            throw new Error(`Download failed: ${response.statusText}`);
+        }
+
+        const blob = await response.blob();
+        const contentDisposition = response.headers.get('content-disposition');
+        let filename = `${type}_${new Date().toISOString().slice(0, 10)}.csv`;
+
+        if (contentDisposition) {
+            const match = contentDisposition.match(/filename=["']?([^"';\n]+)["']?/);
+            if (match) {
+                filename = match[1];
+            }
+        }
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+    } catch (error) {
+        console.error(`Error downloading ${type}:`, error);
+        showErrorModal(`Failed to download ${type}. Please try again.`);
+    }
+}
+
+window.downloadCsv = downloadCsv;
