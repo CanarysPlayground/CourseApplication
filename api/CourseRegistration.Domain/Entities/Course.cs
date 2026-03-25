@@ -83,18 +83,4 @@ public class Course
     /// </summary>
     [NotMapped]
     public int CurrentEnrollment => Registrations?.Count(r => r.Status == Enums.RegistrationStatus.Confirmed) ?? 0;
-
-    /// <summary>
-    /// Computed property for average instructor rating
-    /// </summary>
-    [NotMapped]
-    public double? AverageRating => InstructorRatings?.Any() == true 
-        ? InstructorRatings.Average(r => r.Rating) 
-        : null;
-
-    /// <summary>
-    /// Computed property for total number of ratings
-    /// </summary>
-    [NotMapped]
-    public int RatingCount => InstructorRatings?.Count ?? 0;
 }
