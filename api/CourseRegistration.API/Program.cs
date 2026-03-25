@@ -60,12 +60,14 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateStudentDtoValidator>(
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<IRegistrationRepository, RegistrationRepository>();
+builder.Services.AddScoped<IInstructorRatingRepository, InstructorRatingRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Register services
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+builder.Services.AddScoped<IInstructorRatingService, InstructorRatingService>();
 
 // Register authorization services
 builder.Services.AddScoped<AuthorizationService>();

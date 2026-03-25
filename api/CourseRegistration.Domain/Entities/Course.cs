@@ -74,6 +74,11 @@ public class Course
     public virtual ICollection<Registration> Registrations { get; set; } = new List<Registration>();
 
     /// <summary>
+    /// Navigation property for instructor ratings
+    /// </summary>
+    public virtual ICollection<InstructorRating> InstructorRatings { get; set; } = new List<InstructorRating>();
+
+    /// <summary>
     /// Computed property for current enrollment count
     /// </summary>
     [NotMapped]
