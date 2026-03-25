@@ -70,6 +70,11 @@ public class Student
     public virtual ICollection<Registration> Registrations { get; set; } = new List<Registration>();
 
     /// <summary>
+    /// Navigation property for student's instructor ratings
+    /// </summary>
+    public virtual ICollection<InstructorRating> InstructorRatings { get; set; } = new List<InstructorRating>();
+
+    /// <summary>
     /// Computed property for student's full name
     /// </summary>
     [NotMapped]

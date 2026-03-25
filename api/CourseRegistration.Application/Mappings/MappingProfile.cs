@@ -69,5 +69,27 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.RegistrationDate, opt => opt.Ignore())
             .ForMember(dest => dest.Student, opt => opt.Ignore())
             .ForMember(dest => dest.Course, opt => opt.Ignore());
+
+        // InstructorRating mappings
+        CreateMap<InstructorRating, InstructorRatingDto>()
+            .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.Course.CourseName))
+            .ForMember(dest => dest.InstructorName, opt => opt.MapFrom(src => src.Course.InstructorName))
+            .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.FullName));
+
+        CreateMap<CreateInstructorRatingDto, InstructorRating>()
+            .ForMember(dest => dest.RatingId, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.Course, opt => opt.Ignore())
+            .ForMember(dest => dest.Student, opt => opt.Ignore());
+
+        CreateMap<UpdateInstructorRatingDto, InstructorRating>()
+            .ForMember(dest => dest.RatingId, opt => opt.Ignore())
+            .ForMember(dest => dest.CourseId, opt => opt.Ignore())
+            .ForMember(dest => dest.StudentId, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.Course, opt => opt.Ignore())
+            .ForMember(dest => dest.Student, opt => opt.Ignore());
     }
 }

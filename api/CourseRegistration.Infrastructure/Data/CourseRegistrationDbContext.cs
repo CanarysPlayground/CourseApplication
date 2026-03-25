@@ -33,6 +33,11 @@ public class CourseRegistrationDbContext : DbContext
     public DbSet<Registration> Registrations { get; set; } = null!;
 
     /// <summary>
+    /// InstructorRatings DbSet
+    /// </summary>
+    public DbSet<InstructorRating> InstructorRatings { get; set; } = null!;
+
+    /// <summary>
     /// Configures the model relationships and constraints
     /// </summary>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -108,6 +113,33 @@ public class CourseRegistrationDbContext : DbContext
                   .HasForeignKey(r => r.CourseId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
+
+        // Configure InstructorRating entity
+        modelBuilder.Entity<InstructorRating>(entity =>
+        {
+            entity.HasKey(ir => ir.RatingId);
+            entity.Property(ir => ir.CourseId).IsRequired();
+            entity.Property(ir => ir.StudentId).IsRequired();
+            entity.Property(ir => ir.Rating).IsRequired();
+            entity.Property(ir => ir.Comment).HasMaxLength(1000);
+            entity.Property(ir => ir.CreatedAt).IsRequired();
+            entity.Property(ir => ir.UpdatedAt).IsRequired();
+
+            // Create unique constraint to prevent duplicate ratings per student per course
+            entity.HasIndex(ir => new { ir.StudentId, ir.CourseId })
+                  .IsUnique();
+
+            // Configure relationships
+            entity.HasOne(ir => ir.Student)
+                  .WithMany(s => s.InstructorRatings)
+                  .HasForeignKey(ir => ir.StudentId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(ir => ir.Course)
+                  .WithMany(c => c.InstructorRatings)
+                  .HasForeignKey(ir => ir.CourseId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 
     /// <summary>
@@ -155,6 +187,14 @@ public class CourseRegistrationDbContext : DbContext
                     course.CreatedAt = currentTime;
                 }
                 course.UpdatedAt = currentTime;
+            }
+            else if (entry.Entity is InstructorRating rating)
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    rating.CreatedAt = currentTime;
+                }
+                rating.UpdatedAt = currentTime;
             }
         }
     }

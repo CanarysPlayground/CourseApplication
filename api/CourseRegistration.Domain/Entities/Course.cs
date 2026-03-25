@@ -74,8 +74,27 @@ public class Course
     public virtual ICollection<Registration> Registrations { get; set; } = new List<Registration>();
 
     /// <summary>
+    /// Navigation property for instructor ratings
+    /// </summary>
+    public virtual ICollection<InstructorRating> InstructorRatings { get; set; } = new List<InstructorRating>();
+
+    /// <summary>
     /// Computed property for current enrollment count
     /// </summary>
     [NotMapped]
     public int CurrentEnrollment => Registrations?.Count(r => r.Status == Enums.RegistrationStatus.Confirmed) ?? 0;
+
+    /// <summary>
+    /// Computed property for average instructor rating
+    /// </summary>
+    [NotMapped]
+    public double? AverageRating => InstructorRatings?.Any() == true 
+        ? InstructorRatings.Average(r => r.Rating) 
+        : null;
+
+    /// <summary>
+    /// Computed property for total number of ratings
+    /// </summary>
+    [NotMapped]
+    public int RatingCount => InstructorRatings?.Count ?? 0;
 }

@@ -18,6 +18,7 @@ public class UnitOfWork : IUnitOfWork
     private IStudentRepository? _students;
     private ICourseRepository? _courses;
     private IRegistrationRepository? _registrations;
+    private IInstructorRatingRepository? _instructorRatings;
 
     /// <summary>
     /// Initializes a new instance of the UnitOfWork
@@ -61,6 +62,18 @@ public class UnitOfWork : IUnitOfWork
         {
             _registrations ??= new RegistrationRepository(_context);
             return _registrations;
+        }
+    }
+
+    /// <summary>
+    /// InstructorRating repository
+    /// </summary>
+    public IInstructorRatingRepository InstructorRatings
+    {
+        get
+        {
+            _instructorRatings ??= new InstructorRatingRepository(_context);
+            return _instructorRatings;
         }
     }
 
