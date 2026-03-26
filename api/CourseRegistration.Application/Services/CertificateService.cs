@@ -92,7 +92,7 @@ public class CertificateService : ICertificateService
         await Task.CompletedTask; // Simulate async operation
         
         var certificates = _certificates.Where(c => c.StudentId == studentId);
-        return certificates.Select(MapToDto);
+        return certificates.Select(MapCertificateToDto);
     }
 
     public async Task<CertificateDto?> GetCertificateByIdAsync(Guid certificateId)
@@ -100,7 +100,7 @@ public class CertificateService : ICertificateService
         await Task.CompletedTask; // Simulate async operation
         
         var certificate = _certificates.FirstOrDefault(c => c.CertificateId == certificateId);
-        return certificate != null ? MapToDto(certificate) : null;
+        return certificate != null ? MapCertificateToDto(certificate) : null;
     }
 
     public async Task<IEnumerable<CertificateDto>> GetCertificatesByStudentNameAsync(string studentName)
@@ -118,7 +118,7 @@ public class CertificateService : ICertificateService
             certificates.AddRange(_certificates.Where(c => c.StudentId == student.StudentId));
         }
 
-        return certificates.Select(MapToDto);
+        return certificates.Select(MapCertificateToDto);
     }
 
     public async Task<CertificateDto> CreateCertificateAsync(CreateCertificateDto createCertificateDto)
@@ -138,17 +138,17 @@ public class CertificateService : ICertificateService
         };
 
         _certificates.Add(certificate);
-        return MapToDto(certificate);
+        return MapCertificateToDto(certificate);
     }
 
     public string GenerateCertificateNumber()
     {
-        var year = DateTime.Now.Year;
-        var sequence = _certificates.Count + 1;
-        return $"CERT-{year}-{sequence:D3}";
+        var issuanceYear = DateTime.UtcNow.Year;
+        var certificateSequenceNumber = _certificates.Count + 1;
+        return $"CERT-{issuanceYear}-{certificateSequenceNumber:D3}";
     }
 
-    private CertificateDto MapToDto(Certificate certificate)
+    private CertificateDto MapCertificateToDto(Certificate certificate)
     {
         var student = _students.FirstOrDefault(s => s.StudentId == certificate.StudentId);
         var course = _courses.FirstOrDefault(c => c.CourseId == certificate.CourseId);

@@ -61,12 +61,12 @@ function initializeForm() {
     addCourseForm.addEventListener('submit', handleFormSubmit);
 
     // Instructor name validation (letters, spaces, periods only)
-    document.getElementById('instructorName').addEventListener('input', function(e) {
-        const value = e.target.value;
+    document.getElementById('instructorName').addEventListener('input', function(event) {
+        const value = event.target.value;
         const validPattern = /^[a-zA-Z\s.]*$/;
         
         if (!validPattern.test(value)) {
-            e.target.value = value.replace(/[^a-zA-Z\s.]/g, '');
+            event.target.value = value.replace(/[^a-zA-Z\s.]/g, '');
         }
     });
 
@@ -80,8 +80,8 @@ function initializeForm() {
 }
 
 // Form Submission Handler
-async function handleFormSubmit(e) {
-    e.preventDefault();
+async function handleFormSubmit(event) {
+    event.preventDefault();
     
     if (!validateForm()) {
         return;
@@ -252,8 +252,8 @@ function clearAllErrors() {
     const errorElements = document.querySelectorAll('.error-message');
     const inputElements = document.querySelectorAll('.form-input, .form-textarea');
     
-    errorElements.forEach(el => el.textContent = '');
-    inputElements.forEach(el => el.classList.remove('error'));
+    errorElements.forEach(errorElement => errorElement.textContent = '');
+    inputElements.forEach(inputElement => inputElement.classList.remove('error'));
 }
 
 function displayValidationErrors(errors) {
@@ -284,19 +284,19 @@ function mapFieldName(apiFieldName) {
 }
 
 // UI State Functions
-function setSubmitButton(loading, text) {
-    submitBtn.disabled = loading;
-    submitText.textContent = text;
+function setSubmitButton(isLoading, buttonText) {
+    submitBtn.disabled = isLoading;
+    submitText.textContent = buttonText;
     
-    if (loading) {
-        submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${text}`;
+    if (isLoading) {
+        submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${buttonText}`;
     } else {
-        submitBtn.innerHTML = `<i class="fas fa-plus"></i> ${text}`;
+        submitBtn.innerHTML = `<i class="fas fa-plus"></i> ${buttonText}`;
     }
 }
 
-function showLoading(show) {
-    loadingOverlay.classList.toggle('hidden', !show);
+function showLoading(isVisible) {
+    loadingOverlay.classList.toggle('hidden', !isVisible);
 }
 
 // Modal Functions
@@ -863,8 +863,8 @@ function applyFilters() {
     let filteredRegistrations = allRegistrations;
     
     if (statusFilter !== '') {
-        filteredRegistrations = filteredRegistrations.filter(reg => 
-            reg.status.toString() === statusFilter
+        filteredRegistrations = filteredRegistrations.filter(registration => 
+            registration.status.toString() === statusFilter
         );
     }
     
