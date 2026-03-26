@@ -39,16 +39,16 @@ public class CourseRepository : Repository<Course>, ICourseRepository
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            var lowerSearchTerm = searchTerm.ToLower();
+            var normalizedSearchTerm = searchTerm.ToLower();
             query = query.Where(c => 
-                c.CourseName.ToLower().Contains(lowerSearchTerm) ||
-                (c.Description != null && c.Description.ToLower().Contains(lowerSearchTerm)));
+                c.CourseName.ToLower().Contains(normalizedSearchTerm) ||
+                (c.Description != null && c.Description.ToLower().Contains(normalizedSearchTerm)));
         }
 
         if (!string.IsNullOrWhiteSpace(instructor))
         {
-            var lowerInstructor = instructor.ToLower();
-            query = query.Where(c => c.InstructorName.ToLower().Contains(lowerInstructor));
+            var normalizedInstructorName = instructor.ToLower();
+            query = query.Where(c => c.InstructorName.ToLower().Contains(normalizedInstructorName));
         }
 
         return await query
@@ -72,11 +72,11 @@ public class CourseRepository : Repository<Course>, ICourseRepository
     /// </summary>
     public async Task<IEnumerable<Course>> GetAvailableCoursesAsync()
     {
-        var currentDate = DateTime.UtcNow;
+        var currentUtcDateTime = DateTime.UtcNow;
         
         return await _dbSet
             .Include(c => c.Registrations)
-            .Where(c => c.IsActive && c.StartDate > currentDate)
+            .Where(c => c.IsActive && c.StartDate > currentUtcDateTime)
             .OrderBy(c => c.StartDate)
             .ThenBy(c => c.CourseName)
             .ToListAsync();
@@ -90,9 +90,9 @@ public class CourseRepository : Repository<Course>, ICourseRepository
         if (string.IsNullOrWhiteSpace(instructorName))
             return Enumerable.Empty<Course>();
 
-        var lowerInstructorName = instructorName.ToLower();
+        var normalizedInstructorName = instructorName.ToLower();
         return await _dbSet
-            .Where(c => c.IsActive && c.InstructorName.ToLower().Contains(lowerInstructorName))
+            .Where(c => c.IsActive && c.InstructorName.ToLower().Contains(normalizedInstructorName))
             .OrderBy(c => c.CourseName)
             .ToListAsync();
     }

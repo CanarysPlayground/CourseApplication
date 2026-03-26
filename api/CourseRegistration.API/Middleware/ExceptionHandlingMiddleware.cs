@@ -56,16 +56,16 @@ public class ExceptionHandlingMiddleware
 
         switch (exception)
         {
-            case ArgumentException argEx:
+            case ArgumentException argumentException:
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
                 errorResponse.Message = "Invalid argument provided";
-                errorResponse.Errors = new[] { argEx.Message };
+                errorResponse.Errors = new[] { argumentException.Message };
                 break;
 
-            case InvalidOperationException invOpEx:
+            case InvalidOperationException invalidOperationException:
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
                 errorResponse.Message = "Invalid operation";
-                errorResponse.Errors = new[] { invOpEx.Message };
+                errorResponse.Errors = new[] { invalidOperationException.Message };
                 break;
 
             case UnauthorizedAccessException:
