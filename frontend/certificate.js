@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';  
 import { useParams } from 'react-router-dom';
 import './certificate.css';
-
+//function for the certificate
 function Certificate() {
     const { certificateId } = useParams();
 
