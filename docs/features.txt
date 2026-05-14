@@ -1,0 +1,26 @@
+Course Registration System - Implemented Features
+
+API Features
+- Course management: create, update, soft-delete, list with pagination, search by term and instructor, get available courses, and view registrations per course.
+- Student management: create, update, soft-delete, list with pagination, search by name/email, and view registrations per student.
+- Registration management: create registrations with validation, update registration status with transition rules, cancel registrations, list with pagination/filters (student, course, status), and check if a student is already registered.
+- Admin/role utilities: admin access checks, role access checks, admin role listing, protected admin/instructor endpoints, and role change validation.
+- API conventions: consistent ApiResponseDto envelopes, paged responses, global exception handling, and Swagger UI at the app root.
+- Health and diagnostics: /health endpoint plus structured Serilog logging.
+
+Data and Domain Features
+- Entities for students, courses, registrations, users, and certificates with audit timestamps and validation attributes.
+- Soft-delete behavior for students and courses (IsActive flag).
+- Registration status tracking (Pending, Confirmed, Cancelled, Completed) with optional grades and notes.
+- In-memory EF Core database with seed data for demo usage.
+- Unit of Work and repository pattern for data access.
+
+Frontend Features (static UI)
+- Course creation form with client-side validation, date constraints, and character counting for descriptions.
+- Course listing with search filter, status badges (upcoming/active/completed), and detail modal.
+- Registration management UI with list view, status filter, detail modal, and new-registration modal fed by students/courses data.
+- Modal accessibility helpers (escape to close, click outside to dismiss) and basic error/success feedback.
+
+Certificate Support (demo-focused)
+- Certificate domain model and certificate service with in-memory sample data and certificate number generation.
+- Home page certificate search UI that queries certificates by student name for demo use.
